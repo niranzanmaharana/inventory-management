@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: inventory-management-system
+  #datasource
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/inventory-management?useSSL=false&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: root
+  #jpa properties
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      format_sql: true
+      ddl-auto: update
+    show-sql: false
+
+#mvc properties
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+#logging
+logging:
+  level:
+    org.springframework.web.servlet.PageNotFound: ERROR
+    com.niranzan.inventory: DEBUG

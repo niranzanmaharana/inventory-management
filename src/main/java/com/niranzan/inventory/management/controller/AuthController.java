@@ -41,7 +41,7 @@ public class AuthController {
                                Model model) {
         if (result.hasErrors()) {
             model.addAttribute("user", userDto);
-            return "register";
+            return REGISTRATION_PAGE;
         }
 
         try {
@@ -51,7 +51,7 @@ public class AuthController {
         } catch (Exception ex) {
             model.addAttribute("error", "An unexpected error occurred: " + ex.getMessage());
             model.addAttribute("user", userDto);
-            return "register";
+            return REGISTRATION_PAGE;
         }
 
         return "redirect:/register?success";
@@ -74,6 +74,6 @@ public class AuthController {
         }
 
         model.addAttribute("user", userDto);
-        return "register";
+        return REGISTRATION_PAGE;
     }
 }

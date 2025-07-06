@@ -4,7 +4,8 @@ import com.niranzan.inventory.management.dto.CustomUserDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,11 +30,11 @@ public class GlobalExceptionHandler {
                 .body(Collections.singletonMap("error", "Invalid username or password"));
     }
 
-    @ModelAttribute("firstName")
-    public String populateName(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetail userDetails) {
-            return userDetails.getFirstName();
+    @ModelAttribute
+    public void addUserInfoToModel(Model model, @AuthenticationPrincipal CustomUserDetail userDetails) {
+        if (userDetails != null) {
+            model.addAttribute("firstName", userDetails.getFirstName());
+            model.addAttribute("roles", userDetails.getAuthorities());
         }
-        return "";
     }
 }

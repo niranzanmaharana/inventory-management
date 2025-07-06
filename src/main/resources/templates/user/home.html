@@ -2,12 +2,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<!-- <head th:replace="user/header :: head"></head> -->
-
 <head th:replace="~{user/header :: head}"></head>
 
 <body>
-    <!-- <div th:replace="user/header :: header"></div> -->
     <div th:replace="~{user/header :: header}"></div>
 
     <div class="container fade-in mt-4 mb-5">
@@ -33,8 +30,6 @@
             </tbody>
         </table>
     </div>
-
-    <!-- <div th:replace="user/footer :: footer"></div> -->
     <div th:replace="~{user/footer :: footer}"></div>
 </body>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>

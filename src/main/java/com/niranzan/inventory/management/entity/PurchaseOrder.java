@@ -1,0 +1,67 @@
+package com.niranzan.inventory.management.entity;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "purchase_orders")
+public class PurchaseOrder extends BaseEntity {
+    @Column(nullable = false, length = 100)
+    private String supplierName;
+    @Column(nullable = false)
+    private Double totalAmount;
+    @Column(nullable = false, length = 300)
+    private String billFileUrl;
+    @Column(nullable = false)
+    private LocalDateTime purchaseDate;
+
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
+    private List<PurchaseOrderItem> items = new ArrayList<>();
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getBillFileUrl() {
+        return billFileUrl;
+    }
+
+    public void setBillFileUrl(String billFileUrl) {
+        this.billFileUrl = billFileUrl;
+    }
+
+    public LocalDateTime getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public List<PurchaseOrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<PurchaseOrderItem> items) {
+        this.items = items;
+    }
+}

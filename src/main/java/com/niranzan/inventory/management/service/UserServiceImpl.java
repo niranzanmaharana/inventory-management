@@ -3,32 +3,34 @@ package com.niranzan.inventory.management.service;
 import com.niranzan.inventory.management.dto.UserDto;
 import com.niranzan.inventory.management.entity.Role;
 import com.niranzan.inventory.management.entity.User;
+import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.repository.RoleRepository;
 import com.niranzan.inventory.management.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
-    public void saveUser(UserDto userDto) {
-        User user = new User();
-        user.setName(userDto.getFirstName() + " " + userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        // encrypt the password using spring security
+    public void saveUser(UserDto userDto, String roleName) {
+        User user = userMapper.toEntity(userDto);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        Role role = roleRepository.findByName("ROLE_ADMIN");
+        Role role = roleRepository.findByName(roleName);
         if (role == null) {
-            role = checkRoleExist();
+            role = addNewRole();
         }
         user.setRoles(List.of(role));
         userRepository.save(user);
@@ -40,23 +42,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findUserByMobile(String mobile) {
+        return userRepository.findByMobile(mobile);
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(this::mapToUserDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 
-    private UserDto mapToUserDto(User user) {
-        UserDto userDto = new UserDto();
-        String[] str = user.getName().split(" ");
-        userDto.setFirstName(str[0]);
-        userDto.setLastName(str[1]);
-        userDto.setEmail(user.getEmail());
-        return userDto;
-    }
-
-    private Role checkRoleExist() {
+    private Role addNewRole() {
         Role role = new Role();
         role.setName("ROLE_ADMIN");
         return roleRepository.save(role);

@@ -2,7 +2,7 @@ package com.niranzan.inventory.management.controller;
 
 import com.niranzan.inventory.management.entity.Tutorial;
 import com.niranzan.inventory.management.repository.TutorialRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequiredArgsConstructor
 public class TutorialController {
-    private final TutorialRepository tutorialRepository;
+    @Autowired
+    private TutorialRepository tutorialRepository;
 
     @GetMapping("/tutorials")
     public String getAll(Model model, @Param("keyword") String keyword) {

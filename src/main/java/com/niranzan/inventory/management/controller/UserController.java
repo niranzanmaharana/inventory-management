@@ -2,7 +2,7 @@ package com.niranzan.inventory.management.controller;
 
 import com.niranzan.inventory.management.dto.UserDto;
 import com.niranzan.inventory.management.service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +12,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/user")
-@RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/home")
     public String userHome(Model model) {

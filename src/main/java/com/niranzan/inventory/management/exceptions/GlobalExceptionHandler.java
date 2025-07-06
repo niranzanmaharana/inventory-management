@@ -12,14 +12,6 @@ import java.util.Collections;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Collections.singletonMap("error", ex.getMessage()));
-    }
-
     @ExceptionHandler(NoHandlerFoundException.class)
     public ModelAndView handle404(NoHandlerFoundException ex) {
         ModelAndView mav = new ModelAndView("error/page-not-found");

@@ -8,6 +8,7 @@ public class SecurityUtil {
     private SecurityUtil() {
         // This constructor to enforce not to instantiate this util
     }
+
     public static Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {

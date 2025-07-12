@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{user/header :: head}"></head>
+
+<body>
+    <div th:replace="~{user/header :: header}"></div>
+
+    <div class="container mt-4">
+        <h2>User Profile</h2>
+        <div th:replace="~{fragments/message :: message}"></div>
+        <form th:action="@{/profile/update}" th:object="${user}" method="post" class="needs-validation" novalidate>
+            <input type="hidden" th:field="*{id}" />
+            <div class="row mb-3">
+                <div class="col-md-6 col-12">
+                    <label for="salutation">Salutation</label>
+                    <select class="form-control" th:field="*{salutation}" id="salutation" required>
+                        <option value="" disabled>Select</option>
+                        <option value="Mr.">Mr.</option>
+                        <option value="Mrs.">Mrs.</option>
+                        <option value="Ms.">Ms.</option>
+                        <option value="Dr.">Dr.</option>
+                        <option value="Prof.">Prof.</option>
+                    </select>
+                    <div class="text-danger" th:if="${#fields.hasErrors('salutation')}" th:errors="*{salutation}"></div>
+                </div>
+                <div class="col-md-6 col-12">
+                    &nbsp;
+                </div>
+                <div class="col-md-6 col-12">
+                    <label for="firstName">First Name</label>
+                    <input type="text" class="form-control" th:field="*{firstName}" id="firstName" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" class="form-control" th:field="*{lastName}" id="lastName" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6 col-12">
+                    <label for="gender">Gender</label>
+                    <select class="form-select" th:field="*{gender}" id="gender">
+                        <option value="">-- Select --</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                    </select>
+                    <div class="text-danger" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <label for="dob">Date of Birth</label>
+                    <input type="text" class="form-control datepicker" th:field="*{dob}" id="dob" required>
+                    <div class="text-danger" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6 col-12">
+                    <label for="mobile">Mobile</label>
+                    <input type="text" class="form-control" th:field="*{mobile}" id="mobile">
+                    <div class="text-danger" th:if="${#fields.hasErrors('mobile')}" th:errors="*{mobile}"></div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" th:field="*{email}" id="email">
+                    <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6 col-12">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" th:field="*{username}" id="username" readonly>
+                </div>
+                <div class="col-md-6 col-12">
+                    <label for="role">Role</label>
+                    <input type="text" class="form-control" th:value="${user.role.roleName}" id="role" readonly>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Update</button>
+            </div>
+        </form>
+
+    </div>
+
+    <div th:replace="~{user/footer :: footer}"></div>
+</body>
+<!-- Scripts -->
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
+<script>
+    $(document).ready(function () {
+        $("#dob").datepicker({
+            dateFormat: "dd-mm-yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:c",
+            maxDate: 0,
+            onClose: function () {
+                $(this).trigger('change');
+            }
+        });
+    });
+</script>
+
+</html>

@@ -38,12 +38,13 @@ public class SecurityConfig {
                                 .requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/index").permitAll()
                                 .requestMatchers("/user/**").hasRole("ADMIN")
+                                .requestMatchers("/home", "/profile/**").hasAnyRole("ADMIN", "STAFF", "MANAGER")
                                 .anyRequest().authenticated()
                 ).formLogin(
                         form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/user/home", true)
+                                .defaultSuccessUrl("/home", true)
                                 .permitAll()
                 ).logout(
                         logout -> logout

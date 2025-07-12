@@ -12,6 +12,8 @@ import java.time.LocalDate;
 
 public class UserDto {
     private Long id;
+    @Size(max = 10, message = "Please select salutation")
+    private String salutation;
     @Size(max = 50, min = 3, message = "First name should be 3-50 characters long")
     private String firstName;
     @Size(max = 50, min = 3, message = "Last name should be 3-50 characters long")
@@ -33,6 +35,8 @@ public class UserDto {
     private String username;
     @Size(max = 16, min = 8, message = "Password should be 8-16 characters long")
     private String password;
+    private RoleDto role;
+    private boolean active;
 
     public Long getId() {
         return id;
@@ -40,6 +44,14 @@ public class UserDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getSalutation() {
+        return salutation;
+    }
+
+    public void setSalutation(String salutation) {
+        this.salutation = salutation;
     }
 
     public String getFirstName() {
@@ -104,5 +116,21 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public RoleDto getRole() {
+        return role;
+    }
+
+    public void setRole(RoleDto role) {
+        this.role = role;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

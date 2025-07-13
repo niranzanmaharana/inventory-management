@@ -1,40 +1,53 @@
-<!-- templates/user/home.html -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-<!-- <head th:replace="user/header :: head"></head> -->
 
 <head th:replace="~{user/header :: head}"></head>
 
 <body>
-    <!-- <div th:replace="user/header :: header"></div> -->
     <div th:replace="~{user/header :: header}"></div>
 
     <div class="container fade-in mt-4 mb-5">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 class="text-primary">List of Registered Users</h2>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-primary">Welcome to User Home</h2>
         </div>
-        <table class="table table-bordered table-hover shadow-sm mt-3">
-            <thead class="table-primary">
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="user : ${users}">
-                    <td th:text="${user.firstName}"></td>
-                    <td th:text="${user.lastName}"></td>
-                    <td th:text="${user.email}"></td>
-                </tr>
-            </tbody>
-        </table>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <!-- Personalized welcome message.html -->
+        <div class="mb-4">
+            <h5>Hello <span th:text="${user.salutation}">Salutation</span> <span th:text="${user.firstName}">First name</span></h5>
+            <p>We’re glad to have you in the <strong>Inventory Management System</strong>. Here, you can manage
+                products, monitor stock, and streamline purchasing — all in one place.</p>
+        </div>
+
+        <!-- Features section -->
+        <div class="card shadow-sm p-4">
+            <h4 class="text-success mb-3">Key Features</h4>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <i class="bi bi-box"></i> <strong>Product Management:</strong> Add, edit, and track items across
+                    categories.
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-diagram-3"></i> <strong>Purchase Orders:</strong> Manage supplier orders
+                    efficiently.
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-shield-check"></i> <strong>Role-Based Access:</strong> Users have different
+                    permissions based on roles (Staff, Manager, Admin).
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-graph-up-arrow"></i> <strong>Stock Tracking:</strong> Monitor current stock levels
+                    and restock when needed.
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-lock"></i> <strong>Security:</strong> Enforced login, password encryption, and
+                    restricted access to critical features.
+                </li>
+            </ul>
+        </div>
     </div>
 
-    <!-- <div th:replace="user/footer :: footer"></div> -->
     <div th:replace="~{user/footer :: footer}"></div>
 </body>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -23,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username);
 
         if (user != null) {
-            Collection<? extends GrantedAuthority> authorities = mapRolesToAuthorities(user.getRoles());
+            Collection<? extends GrantedAuthority> authorities = mapRolesToAuthorities(Collections.singleton(user.getRole()));
             return new CustomUserDetail(user, authorities);
         } else {
             throw new UsernameNotFoundException("Invalid username or password.");
@@ -32,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<com.niranzan.inventory.management.entity.Role> roles) {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .toList();
     }
 }

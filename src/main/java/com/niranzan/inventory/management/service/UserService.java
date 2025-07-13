@@ -6,7 +6,7 @@ import com.niranzan.inventory.management.entity.User;
 import java.util.List;
 
 public interface UserService {
-    void saveUser(UserDto userDto, String roleName);
+    User saveUser(UserDto userDto);
 
     User findUserByEmail(String email);
 
@@ -15,4 +15,14 @@ public interface UserService {
     User findUserByUsername(String username);
 
     List<UserDto> findAllUsers();
+
+    User updateUser(UserDto userDto);
+
+    User updateProfile(UserDto userDto);
+
+    User findById(long id);
+
+    User toggleUserStatus(long id);
+
+    void changePassword(long currentUserId, String currentPassword, String newPassword);
 }

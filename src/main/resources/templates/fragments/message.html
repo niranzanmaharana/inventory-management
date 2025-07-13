@@ -1,0 +1,16 @@
+<!-- templates/fragments/message.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="message">
+    <!-- Success message -->
+    <div th:if="${success}" class="alert alert-success text-center py-2">
+        <span th:text="${success}"></span>
+    </div>
+
+    <!-- Error message -->
+    <div th:if="${error}" class="alert alert-danger text-center py-2">
+        <span th:text="${error}"></span>
+    </div>
+</section>
+</body>

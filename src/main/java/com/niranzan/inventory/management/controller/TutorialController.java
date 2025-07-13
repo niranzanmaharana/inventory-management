@@ -14,6 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
+
 @Controller
 public class TutorialController {
     @Autowired
@@ -32,7 +34,7 @@ public class TutorialController {
 
             model.addAttribute("tutorials", tutorials);
         } catch (Exception e) {
-            model.addAttribute("message", e.getMessage());
+            model.addAttribute("message.html", e.getMessage());
         }
 
         return "tutorials";
@@ -54,12 +56,12 @@ public class TutorialController {
         try {
             tutorialRepository.save(tutorial);
 
-            redirectAttributes.addFlashAttribute("message", "The Tutorial has been saved successfully!");
+            redirectAttributes.addFlashAttribute("message.html", "The Tutorial has been saved successfully!");
         } catch (Exception e) {
-            redirectAttributes.addAttribute("message", e.getMessage());
+            redirectAttributes.addAttribute("message.html", e.getMessage());
         }
 
-        return "redirect:/tutorials";
+        return REDIRECT_URL.getPageName() + "tutorials";
     }
 
     @GetMapping("/tutorials/{id}")
@@ -72,9 +74,9 @@ public class TutorialController {
 
             return "tutorial_form";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", e.getMessage());
+            redirectAttributes.addFlashAttribute("message.html", e.getMessage());
 
-            return "redirect:/tutorials";
+            return REDIRECT_URL.getPageName() + "tutorials";
         }
     }
 
@@ -83,12 +85,12 @@ public class TutorialController {
         try {
             tutorialRepository.deleteById(id);
 
-            redirectAttributes.addFlashAttribute("message", "The Tutorial with id=" + id + " has been deleted successfully!");
+            redirectAttributes.addFlashAttribute("message.html", "The Tutorial with id=" + id + " has been deleted successfully!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", e.getMessage());
+            redirectAttributes.addFlashAttribute("message.html", e.getMessage());
         }
 
-        return "redirect:/tutorials";
+        return REDIRECT_URL.getPageName() + "tutorials";
     }
 
     @GetMapping("/tutorials/{id}/published/{status}")
@@ -100,11 +102,11 @@ public class TutorialController {
             String status = published ? "published" : "disabled";
             String message = "The Tutorial id=" + id + " has been " + status;
 
-            redirectAttributes.addFlashAttribute("message", message);
+            redirectAttributes.addFlashAttribute("message.html", message);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", e.getMessage());
+            redirectAttributes.addFlashAttribute("message.html", e.getMessage());
         }
 
-        return "redirect:/tutorials";
+        return REDIRECT_URL.getPageName() + "tutorials";
     }
 }

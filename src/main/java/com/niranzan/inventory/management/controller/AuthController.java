@@ -1,7 +1,10 @@
 package com.niranzan.inventory.management.controller;
 
+import com.niranzan.inventory.management.dto.RoleDto;
 import com.niranzan.inventory.management.dto.UserDto;
 import com.niranzan.inventory.management.enums.AppErrorCode;
+import com.niranzan.inventory.management.enums.AppMessagePlaceholder;
+import com.niranzan.inventory.management.enums.AppRole;
 import com.niranzan.inventory.management.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +16,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
+import static com.niranzan.inventory.management.enums.AppPages.REGISTRATION_PAGE;
+
 @Controller
 public class AuthController {
-    public static final String REGISTRATION_PAGE = "register";
     @Autowired
     private UserService userService;
-
-    @GetMapping("/index")
-    public String home() {
-        return "index";
-    }
 
     @GetMapping("/login")
     public String login() {
@@ -32,7 +32,7 @@ public class AuthController {
     @GetMapping("/register")
     public String registration(Model model) {
         model.addAttribute("user", new UserDto());
-        return REGISTRATION_PAGE;
+        return REGISTRATION_PAGE.getPageName();
     }
 
     @PostMapping("/register")
@@ -41,20 +41,23 @@ public class AuthController {
                                Model model) {
         if (result.hasErrors()) {
             model.addAttribute("user", userDto);
-            return REGISTRATION_PAGE;
+            return REGISTRATION_PAGE.getPageName();
         }
 
         try {
-            userService.saveUser(userDto, "ROLE_ADMIN");
+            RoleDto roleDto = new RoleDto();
+            roleDto.setRoleName(AppRole.ROLE_STAFF.getRoleName());
+            userDto.setRole(roleDto);
+            userService.saveUser(userDto);
         } catch (DataIntegrityViolationException ex) {
             return extractException(userDto, result, model, ex);
         } catch (Exception ex) {
-            model.addAttribute("error", "An unexpected error occurred: " + ex.getMessage());
+            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "An unexpected error occurred: " + ex.getMessage());
             model.addAttribute("user", userDto);
-            return REGISTRATION_PAGE;
+            return REGISTRATION_PAGE.getPageName();
         }
 
-        return "redirect:/register?success";
+        return REDIRECT_URL.getPageName() + REGISTRATION_PAGE.getPageName() + "?success";
     }
 
     private static String extractException(UserDto userDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
@@ -68,12 +71,14 @@ public class AuthController {
             }
             if (message.contains("UK_user_username")) {
                 result.rejectValue("username", AppErrorCode.DUPLICATE_ELEMENT.getErrorCode(), "Username already exists.");
+            } else {
+                model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "Duplicate entry found: " + ex.getMessage());
             }
         } else {
-            model.addAttribute("error", "A data integrity violation occurred.: " + ex.getMessage());
+            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "A data integrity violation occurred.: " + ex.getMessage());
         }
 
         model.addAttribute("user", userDto);
-        return REGISTRATION_PAGE;
+        return REGISTRATION_PAGE.getPageName();
     }
 }

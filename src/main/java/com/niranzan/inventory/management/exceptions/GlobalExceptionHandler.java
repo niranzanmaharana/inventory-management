@@ -1,10 +1,13 @@
 package com.niranzan.inventory.management.exceptions;
 
 import com.niranzan.inventory.management.dto.CustomUserDetail;
+import com.niranzan.inventory.management.enums.AppMessagePlaceholder;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,14 +29,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap("error", "Invalid username or password"));
+                .body(Collections.singletonMap(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "Invalid username or password"));
     }
 
-    @ModelAttribute("firstName")
-    public String populateName(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetail userDetails) {
-            return userDetails.getFirstName();
+    @ModelAttribute
+    public void addUserInfoToModel(HttpServletRequest request, Model model, @AuthenticationPrincipal CustomUserDetail userDetails) {
+        model.addAttribute("requestURI", request.getRequestURI());
+        if (userDetails != null) {
+            model.addAttribute("firstName", userDetails.getFirstName());
+            model.addAttribute("roles", userDetails.getAuthorities());
         }
-        return "";
     }
 }

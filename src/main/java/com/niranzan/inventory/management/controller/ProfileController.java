@@ -85,7 +85,8 @@ public class ProfileController {
         try {
             long currentUserId = SecurityUtil.getCurrentUserId();
             userService.changePassword(currentUserId, currentPassword, newPassword);
-            redirectAttributes.addFlashAttribute("success", "Password changed successfully.");
+            redirectAttributes.addFlashAttribute("success", "Password changed successfully. Please log in again.");
+            return "redirect:/login?passwordChanged";
         } catch (PasswordMismatchException e) {
             redirectAttributes.addFlashAttribute("error", "Current password is incorrect.");
         } catch (Exception e) {

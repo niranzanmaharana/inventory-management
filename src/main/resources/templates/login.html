@@ -1,48 +1,56 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Inventory Management System</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" />
     <link rel="shortcut icon" th:href="@{/images/favicon.png}">
 </head>
+
 <body>
-<div class="container d-flex align-items-center justify-content-center min-vh-100">
-    <div class="card login-card shadow-lg">
-        <div class="card-body">
-            <h2 class="card-title text-center mb-4">Login</h2>
+    <div class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="card login-card shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Login</h2>
 
-            <!-- Alerts inside the card -->
-            <div th:if="${param.error}">
-                <div class="alert alert-danger text-center py-2">Invalid Username or Password</div>
-            </div>
-            <div th:if="${param.logout}">
-                <div class="alert alert-success text-center py-2">You have been logged out.</div>
-            </div>
-
-            <form method="post" th:action="@{/login}">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required value="niranzan">
+                <!-- Alerts inside the card -->
+                <div th:if="${param.error}">
+                    <div class="alert alert-danger text-center py-2">Invalid Username or Password</div>
+                </div>
+                <div th:if="${param.logout}">
+                    <div class="alert alert-success text-center py-2">You have been logged out.</div>
+                </div>
+                <div th:if="${param.passwordChanged}" class="alert alert-success text-center">
+                    Your password was changed successfully. Please log in again.
                 </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required value="niranzan">
-                </div>
+                <form method="post" th:action="@{/login}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Enter username" required value="niranzan">
+                    </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Log In</button>
-                </div>
-            </form>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Enter password" required value="niranzan">
+                    </div>
 
-            <div class="text-center mt-3">
-                <small>Don't have an account? <a th:href="@{/register}">Register here</a></small>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Log In</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small>Don't have an account? <a th:href="@{/register}">Register here</a></small>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </body>
+
 </html>

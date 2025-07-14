@@ -1,20 +1,23 @@
 package com.niranzan.inventory.management.controller;
 
-import com.niranzan.inventory.management.dto.UserDto;
-import com.niranzan.inventory.management.entity.User;
+import com.niranzan.inventory.management.dto.UserProfileDto;
+import com.niranzan.inventory.management.entity.UserProfile;
 import com.niranzan.inventory.management.enums.AppErrorCode;
-import com.niranzan.inventory.management.enums.AppMessagePlaceholder;
-import com.niranzan.inventory.management.mapper.RoleMapper;
+import com.niranzan.inventory.management.enums.AppMessageParameter;
+import com.niranzan.inventory.management.mapper.UserRoleMapper;
 import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,59 +39,64 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private RoleMapper roleMapper;
+    private UserRoleMapper userRoleMapper;
 
-    @GetMapping("/users")
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
+
+    @GetMapping("/user-list")
     public String users(Model model) {
-        List<UserDto> users = userService.findAllUsers();
-        model.addAttribute("users", users);
+        List<UserProfileDto> users = userService.findAllUsers();
+        model.addAttribute("userProfiles", users);
         return USER_LIST.getPageName();
     }
 
     @GetMapping("/add")
     public String addUserForm(Model model) {
-        model.addAttribute("user", new UserDto());
+        model.addAttribute("userProfile", new UserProfileDto());
         return USER_FORM.getPageName();
     }
 
     @GetMapping("/edit/{id}")
     public String editUserForm(Model model, @PathVariable long id) {
-        User user = userService.findById(id);
-        UserDto userDto = userMapper.toDto(user);
-        model.addAttribute("user", userDto);
+        UserProfile userProfile = userService.findById(id);
+        UserProfileDto userProfileDto = userMapper.toDto(userProfile);
+        model.addAttribute("userProfile", userProfileDto);
         return USER_FORM.getPageName();
     }
 
     @PostMapping("/save")
-    public String save(@Valid @ModelAttribute("user") UserDto userDto, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    public String save(@Valid @ModelAttribute("userProfile") UserProfileDto userProfileDto, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("user", userDto);
+            model.addAttribute("userProfile", userProfileDto);
             return USER_FORM.getPageName();
         }
 
         try {
-            User savedUser = (userDto.getId() == null) ? userService.saveUser(userDto) : userService.updateUser(userDto);
+            UserProfile savedUserProfile = (userProfileDto.getId() == null) ? userService.saveUser(userProfileDto) : userService.updateUser(userProfileDto);
 
-            userDto.setId(savedUser.getId());
-            redirectAttributes.addFlashAttribute(AppMessagePlaceholder.SUCCESS_MSG_PLACEHOLDER.getPlaceholderName(), MessageFormatUtil.format("User ({}) saved successfully", userDto.getUsername()));
+            userProfileDto.setId(savedUserProfile.getId());
+            redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("UserProfile ({}) saved successfully", userProfileDto.getUsername()));
             return REDIRECT_URL.getPageName() + USER_LIST.getPageName();
         } catch (DataIntegrityViolationException ex) {
-            return extractException(userDto, result, model, ex);
+            return extractException(userProfileDto, result, model, ex);
         } catch (Exception ex) {
-            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "An error occurred while saving user: " + ex.getMessage());
-            model.addAttribute("user", userDto);
+            model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "An error occurred while saving user: " + ex.getMessage());
+            model.addAttribute("userProfile", userProfileDto);
             return USER_FORM.getPageName();
         }
     }
 
     @PostMapping("/toggle-status")
     public String toggleUserStatus(@RequestParam long id, RedirectAttributes redirectAttributes) {
-        User updatedUser = userService.toggleUserStatus(id);
-        redirectAttributes.addFlashAttribute("success", "User status updated for (" + updatedUser.getFirstName() + ")");
+        UserProfile updatedUserProfile = userService.toggleUserStatus(id);
+        redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("UserProfile status updated for {}", updatedUserProfile.getFirstName()));
         return REDIRECT_URL.getPageName() + USER_LIST.getPageName();
     }
 
-    private static String extractException(UserDto userDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
+    private static String extractException(UserProfileDto userProfileDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
         String message = ex.getMessage();
         if (message.contains("Duplicate entry")) {
             if (message.contains("UK_user_mobile")) {
@@ -100,13 +108,13 @@ public class UserController {
             if (message.contains("UK_user_username")) {
                 result.rejectValue("username", AppErrorCode.DUPLICATE_ELEMENT.getErrorCode(), "Username already exists.");
             } else {
-                model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "Duplicate entry found: " + ex.getMessage());
+                model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "Duplicate entry found: " + ex.getMessage());
             }
         } else {
-            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "A data integrity violation occurred.: " + ex.getMessage());
+            model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "A data integrity violation occurred.: " + ex.getMessage());
         }
 
-        model.addAttribute("user", userDto);
+        model.addAttribute("userProfile", userProfileDto);
         return USER_FORM.getPageName();
     }
 }

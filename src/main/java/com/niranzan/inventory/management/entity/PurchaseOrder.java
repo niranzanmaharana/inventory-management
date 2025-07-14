@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "purchase_orders")
+@Table(name = "purchase_order")
 public class PurchaseOrder extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String supplierName;

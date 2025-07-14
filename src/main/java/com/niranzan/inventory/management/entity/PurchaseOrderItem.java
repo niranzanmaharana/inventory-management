@@ -2,6 +2,7 @@ package com.niranzan.inventory.management.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -10,12 +11,20 @@ import jakarta.persistence.Table;
 @Table(name = "purchase_order_item")
 public class PurchaseOrderItem extends BaseEntity {
     @ManyToOne(optional = false)
-    @JoinColumn(name = "purchase_order_id")
+    @JoinColumn(
+            name = "purchase_order_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_PURCHASE_ORDER_PARENT")
+    )
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(
+            name = "product_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_PURCHASE_ORDER_PRODUCT_PARENT")
+    )
+    private ProductItem productItem;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -34,12 +43,12 @@ public class PurchaseOrderItem extends BaseEntity {
         this.purchaseOrder = purchaseOrder;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductItem getProduct() {
+        return productItem;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProduct(ProductItem productItem) {
+        this.productItem = productItem;
     }
 
     public Integer getQuantity() {

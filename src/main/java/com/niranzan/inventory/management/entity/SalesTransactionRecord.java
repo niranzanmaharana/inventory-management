@@ -2,20 +2,29 @@ package com.niranzan.inventory.management.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "sale_items")
-public class SaleItem extends BaseEntity {
+@Table(name = "sales_transaction_record")
+public class SalesTransactionRecord extends BaseEntity {
     @ManyToOne(optional = false)
-    @JoinColumn(name = "sale_id")
-    private Sale sale;
+    @JoinColumn(
+            name = "sale_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_SALE_PARENT")
+    )
+    private SalesTransaction salesTransaction;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(
+            name = "product_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_SALES_TX_PRODUCT_PARENT")
+    )
+    private ProductItem productItem;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -26,20 +35,20 @@ public class SaleItem extends BaseEntity {
     @Column(nullable = false)
     private Double subtotal;
 
-    public Sale getSale() {
-        return sale;
+    public SalesTransaction getSale() {
+        return salesTransaction;
     }
 
-    public void setSale(Sale sale) {
-        this.sale = sale;
+    public void setSale(SalesTransaction salesTransaction) {
+        this.salesTransaction = salesTransaction;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductItem getProduct() {
+        return productItem;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProduct(ProductItem productItem) {
+        this.productItem = productItem;
     }
 
     public Integer getQuantity() {

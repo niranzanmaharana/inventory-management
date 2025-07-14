@@ -10,12 +10,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-public class UserDto {
+public class UserProfileDto {
     private Long id;
     @Size(max = 10, message = "Please select salutation")
     private String salutation;
+    @NotEmpty(message = "First name must not be empty")
     @Size(max = 50, min = 3, message = "First name should be 3-50 characters long")
     private String firstName;
+    @NotEmpty(message = "Last name must not be empty")
     @Size(max = 50, min = 3, message = "Last name should be 3-50 characters long")
     private String lastName;
     @NotEmpty(message = "Please select gender")
@@ -25,18 +27,25 @@ public class UserDto {
     @NotNull(message = "Date of birth should not be empty")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate dob;
+    @NotEmpty(message = "Mobile number should not be empty")
     @Pattern(regexp = "^[6-9]\\d{9}$", message = "Mobile number should be a valid 10 digit number")
     private String mobile;
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Invalid email")
     @Size(max = 100, message = "Email should be less than 100 characters")
     private String email;
-    @Size(max = 50, min = 5, message = "Username should be 5-50 characters long")
+    @NotEmpty(message = "Username should not be empty")
+    @Pattern(
+            regexp = "^[a-zA-Z]+[0-9]*$",
+            message = "Username must start with a letter, contain only letters and digits, and digits can appear only at the end"
+    )
+    @Size(min = 5, max = 50, message = "Username must be between 5 and 50 characters")
     private String username;
+    @NotEmpty(message = "Password should not be empty")
     @Size(max = 16, min = 8, message = "Password should be 8-16 characters long")
     private String password;
-    private RoleDto role;
-    private boolean active;
+    private UserRoleDto userRole;
+    private boolean enabled;
 
     public Long getId() {
         return id;
@@ -118,19 +127,19 @@ public class UserDto {
         this.password = password;
     }
 
-    public RoleDto getRole() {
-        return role;
+    public UserRoleDto getUserRole() {
+        return userRole;
     }
 
-    public void setRole(RoleDto role) {
-        this.role = role;
+    public void setUserRole(UserRoleDto userRole) {
+        this.userRole = userRole;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

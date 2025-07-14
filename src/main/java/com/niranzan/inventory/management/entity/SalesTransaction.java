@@ -10,16 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "sales")
-public class Sale extends BaseEntity {
+@Table(name = "sales_transaction")
+public class SalesTransaction extends BaseEntity {
     private String customerName;
 
     private LocalDateTime saleDate;
 
     private Double totalAmount;
 
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
-    private List<SaleItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "salesTransaction", cascade = CascadeType.ALL)
+    private List<SalesTransactionRecord> items = new ArrayList<>();
 
     public String getCustomerName() {
         return customerName;
@@ -45,11 +45,11 @@ public class Sale extends BaseEntity {
         this.totalAmount = totalAmount;
     }
 
-    public List<SaleItem> getItems() {
+    public List<SalesTransactionRecord> getItems() {
         return items;
     }
 
-    public void setItems(List<SaleItem> items) {
+    public void setItems(List<SalesTransactionRecord> items) {
         this.items = items;
     }
 }

@@ -3,16 +3,17 @@ package com.niranzan.inventory.management.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "products", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "productName", name = "UK_Product_ProductName")
+@Table(name = "product_item", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "productName", name = "UK_ProductItem_ProductName")
 })
-public class Product extends BaseEntity {
+public class ProductItem extends BaseEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String productName;
     @Column(nullable = false, length = 200)
@@ -25,7 +26,11 @@ public class Product extends BaseEntity {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(
+            name = "category_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_PRODUCT_ITEM_CATEGORY_PARENT")
+    )
     private ProductCategory category;
 
     public String getProductName() {

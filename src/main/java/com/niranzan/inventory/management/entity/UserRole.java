@@ -14,10 +14,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "roles", uniqueConstraints = {
+@Table(name = "user_role", uniqueConstraints = {
         @UniqueConstraint(columnNames = "roleName", name = "UK_Role_RoleName")
 })
-public class Role {
+public class UserRole extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,13 +25,15 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String roleName;
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "userRole", cascade = CascadeType.ALL)
+    private Set<UserProfile> userProfiles = new HashSet<>();
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -44,11 +46,11 @@ public class Role {
         this.roleName = roleName;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<UserProfile> getUsers() {
+        return userProfiles;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setUsers(Set<UserProfile> userProfiles) {
+        this.userProfiles = userProfiles;
     }
 }

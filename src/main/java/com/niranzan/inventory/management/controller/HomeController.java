@@ -1,7 +1,7 @@
 package com.niranzan.inventory.management.controller;
 
-import com.niranzan.inventory.management.dto.UserDto;
-import com.niranzan.inventory.management.entity.User;
+import com.niranzan.inventory.management.dto.UserProfileDto;
+import com.niranzan.inventory.management.entity.UserProfile;
 import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.SecurityUtil;
@@ -23,9 +23,9 @@ public class HomeController {
 
     @GetMapping
     public String home(Model model) {
-        User user = userService.findById(SecurityUtil.getCurrentUserId());
-        UserDto userDto = userMapper.toDto(user);
-        model.addAttribute("user", userDto);
+        UserProfile userProfile = userService.findById(SecurityUtil.getCurrentUserId());
+        UserProfileDto userProfileDto = userMapper.toDto(userProfile);
+        model.addAttribute("userProfile", userProfileDto);
         return USER_HOME.getPageName();
     }
 }

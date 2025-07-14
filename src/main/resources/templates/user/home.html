@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{user/header :: head}"></head>
+<head th:replace="~{fragments/header :: head}"></head>
 
 <body>
-    <div th:replace="~{user/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="container fade-in mt-4 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -15,7 +15,7 @@
 
         <!-- Personalized welcome message.html -->
         <div class="mb-4">
-            <h5>Hello <span th:text="${user.salutation}">Salutation</span> <span th:text="${user.firstName}">First name</span></h5>
+            <h5>Hello <span th:text="${userProfile.salutation}">Salutation</span> <span th:text="${userProfile.firstName}">First name</span></h5>
             <p>We’re glad to have you in the <strong>Inventory Management System</strong>. Here, you can manage
                 products, monitor stock, and streamline purchasing — all in one place.</p>
         </div>
@@ -34,7 +34,7 @@
                 </li>
                 <li class="list-group-item">
                     <i class="bi bi-shield-check"></i> <strong>Role-Based Access:</strong> Users have different
-                    permissions based on roles (Staff, Manager, Admin).
+                    permissions based on userRoles (Staff, Manager, Admin).
                 </li>
                 <li class="list-group-item">
                     <i class="bi bi-graph-up-arrow"></i> <strong>Stock Tracking:</strong> Monitor current stock levels
@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <div th:replace="~{user/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 

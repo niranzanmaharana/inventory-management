@@ -1,6 +1,6 @@
 package com.niranzan.inventory.management.dto;
 
-public class RoleDto {
+public class UserRoleDto {
     private Long id;
     private String roleName;
 

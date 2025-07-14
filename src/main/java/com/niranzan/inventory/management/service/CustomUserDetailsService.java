@@ -1,7 +1,8 @@
 package com.niranzan.inventory.management.service;
 
 import com.niranzan.inventory.management.dto.CustomUserDetail;
-import com.niranzan.inventory.management.entity.User;
+import com.niranzan.inventory.management.entity.UserProfile;
+import com.niranzan.inventory.management.entity.UserRole;
 import com.niranzan.inventory.management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,18 +22,18 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        UserProfile userProfile = userRepository.findByUsername(username);
 
-        if (user != null) {
-            Collection<? extends GrantedAuthority> authorities = mapRolesToAuthorities(Collections.singleton(user.getRole()));
-            return new CustomUserDetail(user, authorities);
+        if (userProfile != null) {
+            Collection<? extends GrantedAuthority> authorities = mapRolesToAuthorities(Collections.singleton(userProfile.getUserRole()));
+            return new CustomUserDetail(userProfile, authorities);
         } else {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
     }
 
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<com.niranzan.inventory.management.entity.Role> roles) {
-        return roles.stream()
+    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<UserRole> userRoles) {
+        return userRoles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .toList();
     }

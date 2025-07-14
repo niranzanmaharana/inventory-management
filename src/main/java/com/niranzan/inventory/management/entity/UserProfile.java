@@ -3,6 +3,7 @@ package com.niranzan.inventory.management.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,14 +17,14 @@ import java.time.LocalDate;
 
 @Entity
 @Table(
-        name = "users",
+        name = "user_profile",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "mobile", name = "UK_user_mobile"),
                 @UniqueConstraint(columnNames = "email", name = "UK_user_email"),
                 @UniqueConstraint(columnNames = "username", name = "UK_user_username")
         }
 )
-public class User {
+public class UserProfile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,16 +58,19 @@ public class User {
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    @JoinColumn(
+            name = "role_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_ROLE_PARENT")
+    )
+    private UserRole userRole;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean active;
-
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -143,19 +147,11 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
-        return role;
+    public UserRole getUserRole() {
+        return userRole;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 }

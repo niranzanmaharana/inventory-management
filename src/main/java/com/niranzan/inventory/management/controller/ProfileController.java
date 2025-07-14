@@ -1,10 +1,10 @@
 package com.niranzan.inventory.management.controller;
 
-import com.niranzan.inventory.management.dto.UserDto;
-import com.niranzan.inventory.management.entity.User;
-import com.niranzan.inventory.management.enums.AppMessagePlaceholder;
+import com.niranzan.inventory.management.dto.UserProfileDto;
+import com.niranzan.inventory.management.entity.UserProfile;
+import com.niranzan.inventory.management.enums.AppMessageParameter;
 import com.niranzan.inventory.management.exceptions.PasswordMismatchException;
-import com.niranzan.inventory.management.mapper.RoleMapper;
+import com.niranzan.inventory.management.mapper.UserRoleMapper;
 import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.SecurityUtil;
@@ -34,47 +34,47 @@ public class ProfileController {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private RoleMapper roleMapper;
+    private UserRoleMapper userRoleMapper;
 
     @GetMapping("view-profile")
     public String profile(Model model, Principal principal) {
-        User user = userService.findUserByUsername(principal.getName());
-        UserDto userDto = userMapper.toDto(user);
-        model.addAttribute("user", userDto);
+        UserProfile userProfile = userService.findUserByUsername(principal.getName());
+        UserProfileDto userProfileDto = userMapper.toDto(userProfile);
+        model.addAttribute("userProfile", userProfileDto);
         return PROFILE_VIEW_PAGE.getPageName();
     }
 
     @PostMapping("/update")
-    public String updateProfile(@Valid @ModelAttribute("user") UserDto userDto, BindingResult result, Model model, Principal principal, RedirectAttributes attributes) {
-        User currentUser = userService.findUserByUsername(principal.getName());
+    public String updateProfile(@Valid @ModelAttribute("userProfile") UserProfileDto userProfileDto, BindingResult result, Model model, Principal principal, RedirectAttributes attributes) {
+        UserProfile currentUserProfile = userService.findUserByUsername(principal.getName());
 
         // Restore immutable fields not submitted in form
-        userDto.setId(currentUser.getId());
-        userDto.setUsername(currentUser.getUsername());
-        userDto.setRole(roleMapper.toDto(currentUser.getRole()));
+        userProfileDto.setId(currentUserProfile.getId());
+        userProfileDto.setUsername(currentUserProfile.getUsername());
+        userProfileDto.setUserRole(userRoleMapper.toDto(currentUserProfile.getUserRole()));
 
         if (result.hasErrors()) {
-            model.addAttribute("user", userDto);
+            model.addAttribute("userProfile", userProfileDto);
             return PROFILE_VIEW_PAGE.getPageName();
         }
 
         try {
-            User updatedUser = userService.updateProfile(userDto);
-            attributes.addFlashAttribute("user", updatedUser);
-            attributes.addFlashAttribute("success", "Profile info updated successfully");
+            UserProfile updatedUserProfile = userService.updateProfile(userProfileDto);
+            attributes.addFlashAttribute("userProfile", updatedUserProfile);
+            attributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), "Profile info updated successfully");
             return REDIRECT_URL.getPageName() + PROFILE_VIEW_PAGE.getPageName();
         } catch (Exception e) {
-            model.addAttribute("user", userDto);
-            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), e.getMessage());
+            model.addAttribute("userProfile", userProfileDto);
+            model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), e.getMessage());
             return PROFILE_VIEW_PAGE.getPageName();
         }
     }
 
     @GetMapping("/change-password")
     public String changePassword(Model model, Principal principal) {
-        User user = userService.findUserByUsername(principal.getName());
-        UserDto userDto = userMapper.toDto(user);
-        model.addAttribute("user", userDto);
+        UserProfile userProfile = userService.findUserByUsername(principal.getName());
+        UserProfileDto userProfileDto = userMapper.toDto(userProfile);
+        model.addAttribute("userProfile", userProfileDto);
         return PROFILE_CHANGE_PASSWORD_PAGE.getPageName();
     }
 
@@ -85,7 +85,7 @@ public class ProfileController {
         try {
             long currentUserId = SecurityUtil.getCurrentUserId();
             userService.changePassword(currentUserId, currentPassword, newPassword);
-            redirectAttributes.addFlashAttribute("success", "Password changed successfully. Please log in again.");
+            redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), "Password changed successfully. Please log in again.");
             return "redirect:/login?passwordChanged";
         } catch (PasswordMismatchException e) {
             redirectAttributes.addFlashAttribute("error", "Current password is incorrect.");

@@ -1,28 +1,28 @@
 package com.niranzan.inventory.management.service;
 
-import com.niranzan.inventory.management.dto.UserDto;
-import com.niranzan.inventory.management.entity.User;
+import com.niranzan.inventory.management.dto.UserProfileDto;
+import com.niranzan.inventory.management.entity.UserProfile;
 
 import java.util.List;
 
 public interface UserService {
-    User saveUser(UserDto userDto);
+    UserProfile saveUser(UserProfileDto userProfileDto);
 
-    User findUserByEmail(String email);
+    UserProfile findUserByEmail(String email);
 
-    User findUserByMobile(String mobile);
+    UserProfile findUserByMobile(String mobile);
 
-    User findUserByUsername(String username);
+    UserProfile findUserByUsername(String username);
 
-    List<UserDto> findAllUsers();
+    List<UserProfileDto> findAllUsers();
 
-    User updateUser(UserDto userDto);
+    UserProfile updateUser(UserProfileDto userProfileDto);
 
-    User updateProfile(UserDto userDto);
+    UserProfile updateProfile(UserProfileDto userProfileDto);
 
-    User findById(long id);
+    UserProfile findById(long id);
 
-    User toggleUserStatus(long id);
+    UserProfile toggleUserStatus(long id);
 
     void changePassword(long currentUserId, String currentPassword, String newPassword);
 }

@@ -1,28 +1,40 @@
 package com.niranzan.inventory.management.controller;
 
-import com.niranzan.inventory.management.dto.RoleDto;
-import com.niranzan.inventory.management.dto.UserDto;
+import com.niranzan.inventory.management.dto.UserRoleDto;
+import com.niranzan.inventory.management.dto.UserProfileDto;
+import com.niranzan.inventory.management.entity.UserProfile;
 import com.niranzan.inventory.management.enums.AppErrorCode;
-import com.niranzan.inventory.management.enums.AppMessagePlaceholder;
+import com.niranzan.inventory.management.enums.AppMessageParameter;
 import com.niranzan.inventory.management.enums.AppRole;
 import com.niranzan.inventory.management.service.UserService;
+import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
 import static com.niranzan.inventory.management.enums.AppPages.REGISTRATION_PAGE;
 
 @Controller
 public class AuthController {
+    public static final String MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE = "userProfile";
     @Autowired
     private UserService userService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+    }
 
     @GetMapping("/login")
     public String login() {
@@ -31,36 +43,38 @@ public class AuthController {
 
     @GetMapping("/register")
     public String registration(Model model) {
-        model.addAttribute("user", new UserDto());
+        model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, new UserProfileDto());
         return REGISTRATION_PAGE.getPageName();
     }
 
     @PostMapping("/register")
-    public String registration(@Valid @ModelAttribute("user") UserDto userDto,
+    public String registration(@Valid @ModelAttribute("userProfile") UserProfileDto userProfileDto,
                                BindingResult result,
-                               Model model) {
+                               Model model,
+                               RedirectAttributes attributes) {
         if (result.hasErrors()) {
-            model.addAttribute("user", userDto);
+            model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, userProfileDto);
             return REGISTRATION_PAGE.getPageName();
         }
 
         try {
-            RoleDto roleDto = new RoleDto();
-            roleDto.setRoleName(AppRole.ROLE_STAFF.getRoleName());
-            userDto.setRole(roleDto);
-            userService.saveUser(userDto);
+            UserRoleDto userRoleDto = new UserRoleDto();
+            userRoleDto.setRoleName(AppRole.ROLE_STAFF.getRoleName());
+            userProfileDto.setUserRole(userRoleDto);
+            UserProfile userProfile = userService.saveUser(userProfileDto);
+            attributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("{} registered successful", userProfile.getFirstName()));
         } catch (DataIntegrityViolationException ex) {
-            return extractException(userDto, result, model, ex);
+            return extractException(userProfileDto, result, model, ex);
         } catch (Exception ex) {
-            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "An unexpected error occurred: " + ex.getMessage());
-            model.addAttribute("user", userDto);
+            model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "An unexpected error occurred: " + ex.getMessage());
+            model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, userProfileDto);
             return REGISTRATION_PAGE.getPageName();
         }
 
-        return REDIRECT_URL.getPageName() + REGISTRATION_PAGE.getPageName() + "?success";
+        return REDIRECT_URL.getPageName() + REGISTRATION_PAGE.getPageName();
     }
 
-    private static String extractException(UserDto userDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
+    private static String extractException(UserProfileDto userProfileDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
         String message = ex.getMessage();
         if (message.contains("Duplicate entry")) {
             if (message.contains("UK_user_mobile")) {
@@ -72,13 +86,13 @@ public class AuthController {
             if (message.contains("UK_user_username")) {
                 result.rejectValue("username", AppErrorCode.DUPLICATE_ELEMENT.getErrorCode(), "Username already exists.");
             } else {
-                model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "Duplicate entry found: " + ex.getMessage());
+                model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "Duplicate entry found: " + ex.getMessage());
             }
         } else {
-            model.addAttribute(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "A data integrity violation occurred.: " + ex.getMessage());
+            model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "A data integrity violation occurred.: " + ex.getMessage());
         }
 
-        model.addAttribute("user", userDto);
+        model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, userProfileDto);
         return REGISTRATION_PAGE.getPageName();
     }
 }

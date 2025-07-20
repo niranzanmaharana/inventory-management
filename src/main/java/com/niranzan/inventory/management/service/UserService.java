@@ -1,5 +1,6 @@
 package com.niranzan.inventory.management.service;
 
+import com.niranzan.inventory.management.dto.ProfileDto;
 import com.niranzan.inventory.management.dto.UserProfileDto;
 import com.niranzan.inventory.management.entity.UserProfile;
 
@@ -18,7 +19,7 @@ public interface UserService {
 
     UserProfile updateUser(UserProfileDto userProfileDto);
 
-    UserProfile updateProfile(UserProfileDto userProfileDto);
+    UserProfile updateProfile(ProfileDto profileDto);
 
     UserProfile findById(long id);
 

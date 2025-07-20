@@ -2,7 +2,7 @@ package com.niranzan.inventory.management.controller;
 
 import com.niranzan.inventory.management.entity.Tutorial;
 import com.niranzan.inventory.management.repository.TutorialRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +17,9 @@ import java.util.List;
 import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
 
 @Controller
+@RequiredArgsConstructor
 public class TutorialController {
-    @Autowired
-    private TutorialRepository tutorialRepository;
+    private final TutorialRepository tutorialRepository;
 
     @GetMapping("/tutorials")
     public String getAll(Model model, @Param("keyword") String keyword) {

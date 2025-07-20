@@ -1,13 +1,11 @@
 package com.niranzan.inventory.management.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-//@Data
-public class UserProfileDto {
+public class ProfileDto {
     private Long id;
     @NotEmpty(message = "Salutation must not be empty")
     @Size(max = 10, message = "Please select salutation")
@@ -32,18 +30,8 @@ public class UserProfileDto {
     @Email(message = "Invalid email")
     @Size(max = 100, message = "Email should be less than 100 characters")
     private String email;
-    @NotEmpty(message = "Username should not be empty")
-    @Pattern(
-            regexp = "^[a-zA-Z]+[0-9]*$",
-            message = "Username must start with a letter, contain only letters and digits, and digits can appear only at the end"
-    )
-    @Size(min = 5, max = 50, message = "Username must be between 5 and 50 characters")
     private String username;
-    @NotEmpty(message = "Password should not be empty")
-    @Size(max = 16, min = 8, message = "Password should be 8-16 characters long")
-    private String password;
-    private UserRoleDto userRole;
-    private boolean enabled;
+    private String roleName;
 
     public Long getId() {
         return id;
@@ -117,27 +105,11 @@ public class UserProfileDto {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getRoleName() {
+        return roleName;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public UserRoleDto getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRoleDto userRole) {
-        this.userRole = userRole;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }

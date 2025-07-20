@@ -1,5 +1,10 @@
 package com.niranzan.inventory.management.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum AppPages {
     REDIRECT_URL("redirect:/"),
     REGISTRATION_PAGE("register"),
@@ -15,12 +20,4 @@ public enum AppPages {
     PRODUCT_CATEGORY_FORM_PAGE("product/category-form");
 
     private final String pageName;
-
-    AppPages(String pageName) {
-        this.pageName = pageName;
-    }
-
-    public String getPageName() {
-        return pageName;
-    }
 }

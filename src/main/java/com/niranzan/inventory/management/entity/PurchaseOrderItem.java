@@ -1,11 +1,6 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "purchase_order_item")
@@ -43,11 +38,11 @@ public class PurchaseOrderItem extends BaseEntity {
         this.purchaseOrder = purchaseOrder;
     }
 
-    public ProductItem getProduct() {
+    public ProductItem getProductItem() {
         return productItem;
     }
 
-    public void setProduct(ProductItem productItem) {
+    public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
     }
 

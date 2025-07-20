@@ -4,42 +4,30 @@ import com.niranzan.inventory.management.dto.UserProfileDto;
 import com.niranzan.inventory.management.entity.UserProfile;
 import com.niranzan.inventory.management.enums.AppErrorCode;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
-import com.niranzan.inventory.management.mapper.UserRoleMapper;
 import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
-import static com.niranzan.inventory.management.enums.AppPages.USER_FORM;
-import static com.niranzan.inventory.management.enums.AppPages.USER_LIST;
+import static com.niranzan.inventory.management.enums.AppPages.*;
 
 @Controller
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private UserRoleMapper userRoleMapper;
+    private final UserService UserService;
+    private final UserMapper userMapper;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -48,7 +36,7 @@ public class UserController {
 
     @GetMapping("/user-list")
     public String users(Model model) {
-        List<UserProfileDto> users = userService.findAllUsers();
+        List<UserProfileDto> users = UserService.findAllUsers();
         model.addAttribute("userProfiles", users);
         return USER_LIST.getPageName();
     }
@@ -61,7 +49,7 @@ public class UserController {
 
     @GetMapping("/edit/{id}")
     public String editUserForm(Model model, @PathVariable long id) {
-        UserProfile userProfile = userService.findById(id);
+        UserProfile userProfile = UserService.findById(id);
         UserProfileDto userProfileDto = userMapper.toDto(userProfile);
         model.addAttribute("userProfile", userProfileDto);
         return USER_FORM.getPageName();
@@ -75,7 +63,7 @@ public class UserController {
         }
 
         try {
-            UserProfile savedUserProfile = (userProfileDto.getId() == null) ? userService.saveUser(userProfileDto) : userService.updateUser(userProfileDto);
+            UserProfile savedUserProfile = (userProfileDto.getId() == null) ? UserService.saveUser(userProfileDto) : UserService.updateUser(userProfileDto);
 
             userProfileDto.setId(savedUserProfile.getId());
             redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("UserProfile ({}) saved successfully", userProfileDto.getUsername()));
@@ -91,7 +79,7 @@ public class UserController {
 
     @PostMapping("/toggle-status")
     public String toggleUserStatus(@RequestParam long id, RedirectAttributes redirectAttributes) {
-        UserProfile updatedUserProfile = userService.toggleUserStatus(id);
+        UserProfile updatedUserProfile = UserService.toggleUserStatus(id);
         redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("UserProfile status updated for {}", updatedUserProfile.getFirstName()));
         return REDIRECT_URL.getPageName() + USER_LIST.getPageName();
     }

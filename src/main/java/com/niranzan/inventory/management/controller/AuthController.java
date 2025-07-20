@@ -1,7 +1,7 @@
 package com.niranzan.inventory.management.controller;
 
-import com.niranzan.inventory.management.dto.UserRoleDto;
 import com.niranzan.inventory.management.dto.UserProfileDto;
+import com.niranzan.inventory.management.dto.UserRoleDto;
 import com.niranzan.inventory.management.entity.UserProfile;
 import com.niranzan.inventory.management.enums.AppErrorCode;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
@@ -9,7 +9,7 @@ import com.niranzan.inventory.management.enums.AppRole;
 import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -26,10 +26,11 @@ import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
 import static com.niranzan.inventory.management.enums.AppPages.REGISTRATION_PAGE;
 
 @Controller
+@RequiredArgsConstructor
 public class AuthController {
     public static final String MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE = "userProfile";
-    @Autowired
-    private UserService userService;
+
+    private final UserService UserService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -61,7 +62,7 @@ public class AuthController {
             UserRoleDto userRoleDto = new UserRoleDto();
             userRoleDto.setRoleName(AppRole.ROLE_STAFF.getRoleName());
             userProfileDto.setUserRole(userRoleDto);
-            UserProfile userProfile = userService.saveUser(userProfileDto);
+            UserProfile userProfile = UserService.saveUser(userProfileDto);
             attributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("{} registered successful", userProfile.getFirstName()));
         } catch (DataIntegrityViolationException ex) {
             return extractException(userProfileDto, result, model, ex);

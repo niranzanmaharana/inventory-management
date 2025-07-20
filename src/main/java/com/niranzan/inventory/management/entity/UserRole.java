@@ -1,14 +1,6 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,11 +38,11 @@ public class UserRole extends BaseEntity {
         this.roleName = roleName;
     }
 
-    public Set<UserProfile> getUsers() {
+    public Set<UserProfile> getUserProfiles() {
         return userProfiles;
     }
 
-    public void setUsers(Set<UserProfile> userProfiles) {
+    public void setUserProfiles(Set<UserProfile> userProfiles) {
         this.userProfiles = userProfiles;
     }
 }

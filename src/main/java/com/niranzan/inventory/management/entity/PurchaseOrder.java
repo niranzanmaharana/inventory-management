@@ -1,14 +1,10 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "purchase_order")
@@ -23,7 +19,7 @@ public class PurchaseOrder extends BaseEntity {
     private LocalDateTime purchaseDate;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
-    private List<PurchaseOrderItem> items = new ArrayList<>();
+    private Set<PurchaseOrderItem> items = new HashSet<>();
 
     public String getSupplierName() {
         return supplierName;
@@ -57,11 +53,11 @@ public class PurchaseOrder extends BaseEntity {
         this.purchaseDate = purchaseDate;
     }
 
-    public List<PurchaseOrderItem> getItems() {
+    public Set<PurchaseOrderItem> getItems() {
         return items;
     }
 
-    public void setItems(List<PurchaseOrderItem> items) {
+    public void setItems(Set<PurchaseOrderItem> items) {
         this.items = items;
     }
 }

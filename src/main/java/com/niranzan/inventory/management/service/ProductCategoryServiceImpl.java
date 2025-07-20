@@ -7,22 +7,19 @@ import com.niranzan.inventory.management.mapper.ProductCategoryMapper;
 import com.niranzan.inventory.management.repository.ProductCategoryRepository;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
 @Service
-public class ProductCategoryCategoryServiceImpl implements ProductCategoryService {
+@RequiredArgsConstructor
+public class ProductCategoryServiceImpl implements ProductCategoryService {
     public static final String MSG_CATEGORY_NOT_FOUND_WITH_ID = "Category not found with id: {}";
     public static final String MSG_PARENT_CATEGORY_NOT_FOUND_WITH_ID = "Parent category not found with id: {}";
     private final ProductCategoryRepository categoryRepository;
     private final ProductCategoryMapper productCategoryMapper;
-
-    public ProductCategoryCategoryServiceImpl(ProductCategoryRepository categoryRepository, ProductCategoryMapper productCategoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.productCategoryMapper = productCategoryMapper;
-    }
 
     @Override
     public List<ProductCategoryDto> getAllActiveCategories() {

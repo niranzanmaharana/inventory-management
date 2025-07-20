@@ -1,19 +1,11 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "product_categories", uniqueConstraints = {
@@ -38,15 +30,7 @@ public class ProductCategory extends BaseEntity {
     private ProductCategory parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<ProductCategory> subCategories = new ArrayList<>();
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    private Set<ProductCategory> subCategories = new HashSet<>();
 
     public String getCategoryName() {
         return categoryName;
@@ -54,6 +38,14 @@ public class ProductCategory extends BaseEntity {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public ProductCategory getParent() {
@@ -64,11 +56,11 @@ public class ProductCategory extends BaseEntity {
         this.parent = parent;
     }
 
-    public List<ProductCategory> getSubCategories() {
+    public Set<ProductCategory> getSubCategories() {
         return subCategories;
     }
 
-    public void setSubCategories(List<ProductCategory> subCategories) {
+    public void setSubCategories(Set<ProductCategory> subCategories) {
         this.subCategories = subCategories;
     }
 }

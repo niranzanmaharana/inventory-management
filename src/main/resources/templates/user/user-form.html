@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <label for="firstName">First Name</label>
-                            <input type="text" class="form-control" th:field="*{firstName}" placeholder="First name"
+                            <input type="text" class="form-control" th:field="*{firstName}" placeholder="First name" id="firstName"
                                 required />
                             <div class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">
                             </div>
@@ -56,7 +56,7 @@
 
                         <div class="col-md-6 col-12">
                             <label for="lastName">Last Name</label>
-                            <input type="text" class="form-control" th:field="*{lastName}" placeholder="Last name"
+                            <input type="text" class="form-control" th:field="*{lastName}" placeholder="Last name" id="lastName"
                                 required />
                             <div class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">
                             </div>
@@ -65,13 +65,13 @@
                         <div class="col-md-6 col-12">
                             <label for="dob">Date of Birth</label>
                             <input type="text" class="form-control datepicker" th:field="*{dob}"
-                                placeholder="dd-MM-yyyy" autocomplete="off" required />
+                                placeholder="dd-MM-yyyy" autocomplete="off" id="dob" required />
                             <div class="text-danger" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
                         </div>
 
                         <div class="col-md-6 col-12">
                             <label for="gender">Gender</label>
-                            <select class="form-control" th:field="*{gender}" required>
+                            <select class="form-control" th:field="*{gender}" id="gender" required>
                                 <option value="" disabled>Select gender</option>
                                 <option value="MALE">Male</option>
                                 <option value="FEMALE">Female</option>
@@ -82,20 +82,20 @@
                         <div class="col-md-6 col-12">
                             <label for="mobile">Mobile</label>
                             <input type="text" class="form-control" th:field="*{mobile}"
-                                placeholder="Enter 10-digit mobile number" pattern="[6-9][0-9]{9}" required />
+                                placeholder="Enter 10-digit mobile number" id="mobile" pattern="[6-9][0-9]{9}" required />
                             <div class="text-danger" th:if="${#fields.hasErrors('mobile')}" th:errors="*{mobile}"></div>
                         </div>
 
                         <div class="col-md-6 col-12">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" th:field="*{email}" placeholder="Enter email"
+                            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Enter email"
                                 required />
                             <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
 
                         <div class="col-md-6 col-12">
                             <label for="username">Username</label>
-                            <input type="text" class="form-control" th:field="*{username}" placeholder="Enter username"
+                            <input type="text" class="form-control" th:field="*{username}" placeholder="Enter username" id="username"
                                 required />
 
                             <!-- Validation error -->

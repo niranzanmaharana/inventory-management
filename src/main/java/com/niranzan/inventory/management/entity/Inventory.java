@@ -1,11 +1,6 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "inventory")
@@ -23,11 +18,11 @@ public class Inventory extends BaseEntity {
     @Column(length = 100)
     private String location;
 
-    public ProductItem getProduct() {
+    public ProductItem getProductItem() {
         return productItem;
     }
 
-    public void setProduct(ProductItem productItem) {
+    public void setProductItem(ProductItem productItem) {
         this.productItem = productItem;
     }
 

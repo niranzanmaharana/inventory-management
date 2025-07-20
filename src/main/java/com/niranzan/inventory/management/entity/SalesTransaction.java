@@ -6,8 +6,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "sales_transaction")
@@ -19,7 +19,7 @@ public class SalesTransaction extends BaseEntity {
     private Double totalAmount;
 
     @OneToMany(mappedBy = "salesTransaction", cascade = CascadeType.ALL)
-    private List<SalesTransactionRecord> items = new ArrayList<>();
+    private Set<SalesTransactionRecord> items = new HashSet<>();
 
     public String getCustomerName() {
         return customerName;
@@ -45,11 +45,11 @@ public class SalesTransaction extends BaseEntity {
         this.totalAmount = totalAmount;
     }
 
-    public List<SalesTransactionRecord> getItems() {
+    public Set<SalesTransactionRecord> getItems() {
         return items;
     }
 
-    public void setItems(List<SalesTransactionRecord> items) {
+    public void setItems(Set<SalesTransactionRecord> items) {
         this.items = items;
     }
 }

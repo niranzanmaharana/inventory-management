@@ -16,8 +16,8 @@ public enum AppPages {
     PROFILE_VIEW_PAGE("profile/view-profile"),
     PROFILE_CHANGE_PASSWORD_PAGE("profile/change-password"),
     // product pages
-    PRODUCT_CATEGORY_LIST_PAGE("product/category-list"),
-    PRODUCT_CATEGORY_FORM_PAGE("product/category-form");
+    PRODUCT_CATEGORY_LIST_PAGE("product-category/category-list"),
+    PRODUCT_CATEGORY_FORM_PAGE("product-category/category-form");
 
     private final String pageName;
 }

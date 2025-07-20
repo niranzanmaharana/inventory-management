@@ -9,8 +9,9 @@ import java.util.Set;
 @Entity
 @Table(name = "purchase_order")
 public class PurchaseOrder extends BaseEntity {
-    @Column(nullable = false, length = 100)
-    private String supplierName;
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
     @Column(nullable = false)
     private Double totalAmount;
     @Column(nullable = false, length = 300)
@@ -21,12 +22,12 @@ public class PurchaseOrder extends BaseEntity {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
     private Set<PurchaseOrderItem> items = new HashSet<>();
 
-    public String getSupplierName() {
-        return supplierName;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public Double getTotalAmount() {

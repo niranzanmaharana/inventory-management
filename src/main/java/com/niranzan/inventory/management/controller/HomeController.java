@@ -16,7 +16,7 @@ import static com.niranzan.inventory.management.enums.AppPages.USER_HOME;
 @Controller
 @RequestMapping("/home")
 @RequiredArgsConstructor
-public class HomeController {
+public class HomeController extends BaseController {
     private final UserService UserService;
     private final UserMapper userMapper;
 

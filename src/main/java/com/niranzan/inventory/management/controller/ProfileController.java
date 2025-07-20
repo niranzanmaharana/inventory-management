@@ -6,7 +6,6 @@ import com.niranzan.inventory.management.entity.UserProfile;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
 import com.niranzan.inventory.management.exceptions.PasswordMismatchException;
 import com.niranzan.inventory.management.mapper.UserMapper;
-import com.niranzan.inventory.management.mapper.UserRoleMapper;
 import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.SecurityUtil;
 import jakarta.validation.Valid;
@@ -26,10 +25,9 @@ import static com.niranzan.inventory.management.enums.AppPages.*;
 @RequestMapping("/profile")
 @RequiredArgsConstructor
 @Slf4j
-public class ProfileController {
+public class ProfileController extends BaseController {
     private final UserService UserService;
     private final UserMapper userMapper;
-    private final UserRoleMapper userRoleMapper;
 
     @GetMapping("view-profile")
     public String profile(Model model, Principal principal) {

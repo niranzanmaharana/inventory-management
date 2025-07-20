@@ -20,7 +20,7 @@
 
                 <div th:replace="~{fragments/message :: message}"></div>
 
-                <form class="needs-validation" novalidate method="post" th:action="@{/register}" th:object="${user}">
+                <form class="needs-validation" novalidate method="post" th:action="@{/register}" th:object="${userProfile}">
                     <div class="row">
                         <div class="col-md-6 col-12">
                             <label for="salutation">Salutation</label>

@@ -3,21 +3,21 @@ package com.niranzan.inventory.management.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "purchase_order_item")
-public class PurchaseOrderItem extends BaseEntity {
+@Table(name = "sales_transaction_record")
+public class SalesTransactionRecord extends BaseEntity {
     @ManyToOne(optional = false)
     @JoinColumn(
-            name = "purchase_order_id",
+            name = "sale_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_PURCHASE_ORDER_PARENT")
+            foreignKey = @ForeignKey(name = "FK_SALE_PARENT")
     )
-    private PurchaseOrder purchaseOrder;
+    private SalesTransaction salesTransaction;
 
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "product_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_PURCHASE_ORDER_PRODUCT_PARENT")
+            foreignKey = @ForeignKey(name = "FK_SALES_TX_PRODUCT_PARENT")
     )
     private ProductItem productItem;
 
@@ -30,12 +30,12 @@ public class PurchaseOrderItem extends BaseEntity {
     @Column(nullable = false)
     private Double subtotal;
 
-    public PurchaseOrder getPurchaseOrder() {
-        return purchaseOrder;
+    public SalesTransaction getSalesTransaction() {
+        return salesTransaction;
     }
 
-    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
+    public void setSalesTransaction(SalesTransaction salesTransaction) {
+        this.salesTransaction = salesTransaction;
     }
 
     public ProductItem getProductItem() {

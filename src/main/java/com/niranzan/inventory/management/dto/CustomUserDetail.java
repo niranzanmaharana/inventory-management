@@ -1,38 +1,38 @@
 package com.niranzan.inventory.management.dto;
 
-import com.niranzan.inventory.management.entity.User;
+import com.niranzan.inventory.management.entity.UserProfile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
 public class CustomUserDetail implements UserDetails {
-    private final User user;
+    private final UserProfile userProfile;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetail(User user, Collection<? extends GrantedAuthority> authorities) {
-        this.user = user;
+    public CustomUserDetail(UserProfile userProfile, Collection<? extends GrantedAuthority> authorities) {
+        this.userProfile = userProfile;
         this.authorities = authorities;
     }
 
     public String getFirstName() {
-        return user.getFirstName();
+        return userProfile.getFirstName();
     }
 
     public String getLastName() {
-        return user.getLastName();
+        return userProfile.getLastName();
     }
 
     public String getFullName() {
-        return user.getFirstName() + " " + user.getLastName();
+        return userProfile.getFirstName() + " " + userProfile.getLastName();
     }
 
     public String getEmail() {
-        return user.getEmail();
+        return userProfile.getEmail();
     }
 
     public Long getId() {
-        return this.user.getId();
+        return this.userProfile.getId();
     }
 
     @Override
@@ -42,12 +42,12 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return userProfile.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername(); // Use username for login
+        return userProfile.getUsername(); // Use username for login
     }
 
     @Override

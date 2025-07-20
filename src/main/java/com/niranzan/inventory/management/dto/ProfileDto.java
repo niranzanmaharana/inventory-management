@@ -1,21 +1,19 @@
 package com.niranzan.inventory.management.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-public class UserDto {
+public class ProfileDto {
     private Long id;
+    @NotEmpty(message = "Salutation must not be empty")
     @Size(max = 10, message = "Please select salutation")
     private String salutation;
+    @NotEmpty(message = "First name must not be empty")
     @Size(max = 50, min = 3, message = "First name should be 3-50 characters long")
     private String firstName;
+    @NotEmpty(message = "Last name must not be empty")
     @Size(max = 50, min = 3, message = "Last name should be 3-50 characters long")
     private String lastName;
     @NotEmpty(message = "Please select gender")
@@ -25,18 +23,15 @@ public class UserDto {
     @NotNull(message = "Date of birth should not be empty")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate dob;
+    @NotEmpty(message = "Mobile number should not be empty")
     @Pattern(regexp = "^[6-9]\\d{9}$", message = "Mobile number should be a valid 10 digit number")
     private String mobile;
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Invalid email")
     @Size(max = 100, message = "Email should be less than 100 characters")
     private String email;
-    @Size(max = 50, min = 5, message = "Username should be 5-50 characters long")
     private String username;
-    @Size(max = 16, min = 8, message = "Password should be 8-16 characters long")
-    private String password;
-    private RoleDto role;
-    private boolean active;
+    private String roleName;
 
     public Long getId() {
         return id;
@@ -110,27 +105,11 @@ public class UserDto {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getRoleName() {
+        return roleName;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public RoleDto getRole() {
-        return role;
-    }
-
-    public void setRole(RoleDto role) {
-        this.role = role;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }

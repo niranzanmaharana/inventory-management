@@ -1,7 +1,7 @@
 package com.niranzan.inventory.management.exceptions;
 
 import com.niranzan.inventory.management.dto.CustomUserDetail;
-import com.niranzan.inventory.management.enums.AppMessagePlaceholder;
+import com.niranzan.inventory.management.enums.AppMessageParameter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap(AppMessagePlaceholder.ERROR_MSG_PLACEHOLDER.getPlaceholderName(), "Invalid username or password"));
+                .body(Collections.singletonMap(AppMessageParameter.ERROR_PARAM_NM.getName(), "Invalid username or password"));
     }
 
     @ModelAttribute

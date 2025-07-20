@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{user/header :: head}"></head>
+<head th:replace="~{fragments/header :: head}"></head>
 
 <body>
-    <div th:replace="~{user/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="container mt-4">
         <h2>User Profile</h2>
         <div th:replace="~{fragments/message :: message}"></div>
-        <form th:action="@{/profile/update}" th:object="${user}" method="post" class="needs-validation" novalidate>
+        <form th:action="@{/profile/update}" th:object="${userProfile}" method="post" class="needs-validation" novalidate>
             <input type="hidden" th:field="*{id}" />
             <div class="row mb-3">
                 <div class="col-md-6 col-12">
@@ -75,8 +75,8 @@
                     <input type="text" class="form-control" th:field="*{username}" id="username" readonly>
                 </div>
                 <div class="col-md-6 col-12">
-                    <label for="role">Role</label>
-                    <input type="text" class="form-control" th:value="${user.role.roleName}" id="role" readonly>
+                    <label for="userRole">Role</label>
+                    <input type="text" class="form-control" th:value="${userProfile.roleName}" id="userRole" readonly>
                 </div>
             </div>
 
@@ -87,7 +87,7 @@
 
     </div>
 
-    <div th:replace="~{user/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 <!-- Scripts -->
 <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>

@@ -18,7 +18,7 @@ import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
 
 @Controller
 @RequiredArgsConstructor
-public class TutorialController {
+public class TutorialController extends BaseController {
     private final TutorialRepository tutorialRepository;
 
     @GetMapping("/tutorials")

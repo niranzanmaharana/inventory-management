@@ -10,14 +10,11 @@ import com.niranzan.inventory.management.service.UserService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -27,15 +24,10 @@ import static com.niranzan.inventory.management.enums.AppPages.REGISTRATION_PAGE
 
 @Controller
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController extends BaseController {
     public static final String MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE = "userProfile";
 
     private final UserService UserService;
-
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-    }
 
     @GetMapping("/login")
     public String login() {

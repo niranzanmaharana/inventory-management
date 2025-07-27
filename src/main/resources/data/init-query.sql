@@ -1,0 +1,10 @@
+DROP TABLE sales_transaction_item;
+DROP TABLE sales_transaction;
+DROP TABLE purchase_order_item;
+DROP TABLE purchase_order;
+DROP TABLE product_attribute;
+DROP TABLE inventory;
+DROP TABLE category_attribute_type;
+DROP TABLE attribute_type;
+DROP TABLE product_item;
+DROP TABLE product_categories;

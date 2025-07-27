@@ -19,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private static final String USER_NOT_FOUND_WITH_ID = "UserProfile not found with id: ";
-    private final UserRepository UserRepository;
-    private final RoleRepository RoleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -28,32 +28,32 @@ public class UserServiceImpl implements UserService {
     public UserProfile saveUser(UserProfileDto userProfileDto) {
         UserProfile userProfile = userMapper.toEntity(userProfileDto);
         userProfile.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));
-        UserRole userRole = RoleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
+        UserRole userRole = roleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
         if (userRole == null) {
             userRole = addNewRole(userProfileDto.getUserRole().getRoleName());
         }
         userProfile.setUserRole(userRole);
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public UserProfile findUserByEmail(String email) {
-        return UserRepository.findByEmail(email);
+        return userRepository.findByEmail(email);
     }
 
     @Override
     public UserProfile findUserByMobile(String mobile) {
-        return UserRepository.findByMobile(mobile);
+        return userRepository.findByMobile(mobile);
     }
 
     @Override
     public UserProfile findUserByUsername(String username) {
-        return UserRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 
     @Override
     public List<UserProfileDto> findAllUsers() {
-        List<UserProfile> userProfiles = UserRepository.findAll();
+        List<UserProfile> userProfiles = userRepository.findAll();
         return userProfiles.stream()
                 .map(userMapper::toDto)
                 .toList();
@@ -61,42 +61,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfile updateUser(UserProfileDto userProfileDto) {
-        UserProfile userProfile = UserRepository.findById(userProfileDto.getId())
+        UserProfile userProfile = userRepository.findById(userProfileDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + userProfileDto.getId()));
 
         updateUser(userProfileDto, userProfile);
 
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public UserProfile updateProfile(ProfileDto profileDto) {
-        UserProfile userProfile = UserRepository.findById(profileDto.getId())
+        UserProfile userProfile = userRepository.findById(profileDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + profileDto.getId()));
 
         updateProfile(profileDto, userProfile);
 
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public UserProfile findById(long id) {
-        return UserRepository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + id));
     }
 
     @Override
     public UserProfile toggleUserStatus(long id) {
-        UserProfile userProfile = UserRepository.findById(id)
+        UserProfile userProfile = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + id));
 
         userProfile.setEnabled(!userProfile.isEnabled());
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public void changePassword(long id, String currentPassword, String newPassword) {
-        UserProfile userProfile = UserRepository.findById(id)
+        UserProfile userProfile = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("UserProfile not found: " + id));
 
         if (!passwordEncoder.matches(currentPassword, userProfile.getPassword())) {
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userProfile.setPassword(passwordEncoder.encode(newPassword));
-        UserRepository.save(userProfile);
+        userRepository.save(userProfile);
     }
 
     private void updateUser(UserProfileDto userProfileDto, UserProfile userProfile) {
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setMobile(userProfileDto.getMobile());
         userProfile.setEmail(userProfileDto.getEmail());
         userProfile.setDob(userProfileDto.getDob());
-        UserRole userRole = RoleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
+        UserRole userRole = roleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
         if (userRole == null) {
             userRole = addNewRole(userProfileDto.getUserRole().getRoleName());
         }
@@ -135,6 +135,6 @@ public class UserServiceImpl implements UserService {
     private UserRole addNewRole(String roleName) {
         UserRole userRole = new UserRole();
         userRole.setRoleName(roleName);
-        return RoleRepository.save(userRole);
+        return roleRepository.save(userRole);
     }
 }

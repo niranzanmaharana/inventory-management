@@ -61,7 +61,7 @@ public class TutorialController extends BaseController {
             redirectAttributes.addAttribute("message.html", e.getMessage());
         }
 
-        return REDIRECT_URL.getPageName() + "tutorials";
+        return REDIRECT_URL.getPath() + "tutorials";
     }
 
     @GetMapping("/tutorials/{id}")
@@ -76,7 +76,7 @@ public class TutorialController extends BaseController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("message.html", e.getMessage());
 
-            return REDIRECT_URL.getPageName() + "tutorials";
+            return REDIRECT_URL.getPath() + "tutorials";
         }
     }
 
@@ -90,7 +90,7 @@ public class TutorialController extends BaseController {
             redirectAttributes.addFlashAttribute("message.html", e.getMessage());
         }
 
-        return REDIRECT_URL.getPageName() + "tutorials";
+        return REDIRECT_URL.getPath() + "tutorials";
     }
 
     @GetMapping("/tutorials/{id}/published/{status}")
@@ -107,6 +107,6 @@ public class TutorialController extends BaseController {
             redirectAttributes.addFlashAttribute("message.html", e.getMessage());
         }
 
-        return REDIRECT_URL.getPageName() + "tutorials";
+        return REDIRECT_URL.getPath() + "tutorials";
     }
 }

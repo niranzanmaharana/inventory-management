@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ProductCategoryDto {
+public class CategoryDto {
     private Long id;
     @NotEmpty(message = "Category name must not be empty")
     @Size(min = 3, max = 50, message = "Category name should be between 3 and 50 characters")
@@ -16,7 +16,8 @@ public class ProductCategoryDto {
     private String description;
     private boolean enabled;
     private Long parentId;
-    private Set<ProductCategoryDto> subCategories = new HashSet<>();
+    private boolean leaf;
+    private Set<CategoryDto> subCategories = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -58,11 +59,19 @@ public class ProductCategoryDto {
         this.parentId = parentId;
     }
 
-    public Set<ProductCategoryDto> getSubCategories() {
+    public Set<CategoryDto> getSubCategories() {
         return subCategories;
     }
 
-    public void setSubCategories(Set<ProductCategoryDto> subCategories) {
+    public void setSubCategories(Set<CategoryDto> subCategories) {
         this.subCategories = subCategories;
+    }
+
+    public boolean isLeaf() {
+        return leaf;
+    }
+
+    public void setLeaf(boolean leaf) {
+        this.leaf = leaf;
     }
 }

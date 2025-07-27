@@ -35,7 +35,7 @@ public class ProfileController extends BaseController {
         UserProfile userProfile = UserService.findUserByUsername(principal.getName());
         ProfileDto profile = userMapper.toProfile(userProfile);
         model.addAttribute("userProfile", profile);
-        return PROFILE_VIEW_PAGE.getPageName();
+        return PROFILE_VIEW_PATH.getPath();
     }
 
     @PostMapping("/update")
@@ -48,18 +48,18 @@ public class ProfileController extends BaseController {
 
         if (result.hasErrors()) {
             model.addAttribute("userProfile", profileDto);
-            return PROFILE_VIEW_PAGE.getPageName();
+            return PROFILE_VIEW_PATH.getPath();
         }
 
         try {
             UserProfile updatedUserProfile = UserService.updateProfile(profileDto);
             attributes.addFlashAttribute("userProfile", updatedUserProfile);
             attributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), "Profile info updated successfully");
-            return REDIRECT_URL.getPageName() + PROFILE_VIEW_PAGE.getPageName();
+            return REDIRECT_URL.getPath() + PROFILE_VIEW_PATH.getPath();
         } catch (Exception e) {
             model.addAttribute("userProfile", profileDto);
             model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), e.getMessage());
-            return PROFILE_VIEW_PAGE.getPageName();
+            return PROFILE_VIEW_PATH.getPath();
         }
     }
 
@@ -68,7 +68,7 @@ public class ProfileController extends BaseController {
         UserProfile userProfile = UserService.findUserByUsername(principal.getName());
         UserProfileDto userProfileDto = userMapper.toDto(userProfile);
         model.addAttribute("userProfile", userProfileDto);
-        return PROFILE_CHANGE_PASSWORD_PAGE.getPageName();
+        return PROFILE_CHANGE_PASSWORD_PATH.getPath();
     }
 
     @PostMapping("/change-password")
@@ -86,6 +86,6 @@ public class ProfileController extends BaseController {
             redirectAttributes.addFlashAttribute("error", "Something went wrong: " + e.getMessage());
         }
 
-        return REDIRECT_URL.getPageName() + PROFILE_CHANGE_PASSWORD_PAGE.getPageName();
+        return REDIRECT_URL.getPath() + PROFILE_CHANGE_PASSWORD_PATH.getPath();
     }
 }

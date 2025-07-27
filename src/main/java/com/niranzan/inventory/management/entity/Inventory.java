@@ -9,7 +9,7 @@ public class Inventory extends BaseEntity {
     @JoinColumn(
             name = "product_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_INVENTORY_PRODUCT_PARENT")
+            foreignKey = @ForeignKey(name = "FK_INVENTORY_X_PRODUCT")
     )
     private ProductItem productItem;
 

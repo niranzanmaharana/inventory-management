@@ -1,64 +1,40 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "purchase_order")
 public class PurchaseOrder extends BaseEntity {
-    @ManyToOne
-    @JoinColumn(name = "supplier_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_PURCHASE_ORDER_X_SUPPLIER")
+    )
     private Supplier supplier;
     @Column(nullable = false)
-    private Double totalAmount;
-    @Column(nullable = false, length = 300)
+    private BigDecimal totalAmount;
+    @Column(nullable = false, length = 300, columnDefinition = "VARCHAR(300) DEFAULT 'PENDING'")
     private String billFileUrl;
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
-    private Set<PurchaseOrderItem> items = new HashSet<>();
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public String getBillFileUrl() {
-        return billFileUrl;
-    }
-
-    public void setBillFileUrl(String billFileUrl) {
-        this.billFileUrl = billFileUrl;
-    }
-
-    public LocalDateTime getPurchaseDate() {
-        return purchaseDate;
-    }
-
-    public void setPurchaseDate(LocalDateTime purchaseDate) {
-        this.purchaseDate = purchaseDate;
-    }
-
-    public Set<PurchaseOrderItem> getItems() {
-        return items;
-    }
-
-    public void setItems(Set<PurchaseOrderItem> items) {
-        this.items = items;
-    }
+    private Set<PurchaseItem> items = new HashSet<>();
 }

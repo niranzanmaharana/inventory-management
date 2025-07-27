@@ -31,13 +31,13 @@ public class UserController extends BaseController {
     public String users(Model model) {
         List<UserProfileDto> users = UserService.findAllUsers();
         model.addAttribute("userProfiles", users);
-        return USER_LIST.getPageName();
+        return USER_LIST_PATH.getPath();
     }
 
     @GetMapping("/add")
     public String addUserForm(Model model) {
         model.addAttribute("userProfile", new UserProfileDto());
-        return USER_FORM.getPageName();
+        return USER_FORM_PATH.getPath();
     }
 
     @GetMapping("/edit/{id}")
@@ -45,14 +45,14 @@ public class UserController extends BaseController {
         UserProfile userProfile = UserService.findById(id);
         UserProfileDto userProfileDto = userMapper.toDto(userProfile);
         model.addAttribute("userProfile", userProfileDto);
-        return USER_FORM.getPageName();
+        return USER_FORM_PATH.getPath();
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("userProfile") UserProfileDto userProfileDto, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("userProfile", userProfileDto);
-            return USER_FORM.getPageName();
+            return USER_FORM_PATH.getPath();
         }
 
         try {
@@ -60,13 +60,13 @@ public class UserController extends BaseController {
 
             userProfileDto.setId(savedUserProfile.getId());
             redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("UserProfile ({}) saved successfully", userProfileDto.getUsername()));
-            return REDIRECT_URL.getPageName() + USER_LIST.getPageName();
+            return REDIRECT_URL.getPath() + USER_LIST_PATH.getPath();
         } catch (DataIntegrityViolationException ex) {
             return extractException(userProfileDto, result, model, ex);
         } catch (Exception ex) {
             model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "An error occurred while saving user: " + ex.getMessage());
             model.addAttribute("userProfile", userProfileDto);
-            return USER_FORM.getPageName();
+            return USER_FORM_PATH.getPath();
         }
     }
 
@@ -74,7 +74,7 @@ public class UserController extends BaseController {
     public String toggleUserStatus(@RequestParam long id, RedirectAttributes redirectAttributes) {
         UserProfile updatedUserProfile = UserService.toggleUserStatus(id);
         redirectAttributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(), MessageFormatUtil.format("UserProfile status updated for {}", updatedUserProfile.getFirstName()));
-        return REDIRECT_URL.getPageName() + USER_LIST.getPageName();
+        return REDIRECT_URL.getPath() + USER_LIST_PATH.getPath();
     }
 
     private static String extractException(UserProfileDto userProfileDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
@@ -96,6 +96,6 @@ public class UserController extends BaseController {
         }
 
         model.addAttribute("userProfile", userProfileDto);
-        return USER_FORM.getPageName();
+        return USER_FORM_PATH.getPath();
     }
 }

@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ImageFileType {
-    RECEIPT_PHOTO("Bill Photo"),
-    PRODUCT_PHOTO("Product Photo");
+    RECEIPT_PHOTO("RECEIPT_PHOTO"),
+    PRODUCT_PHOTO("PRODUCT_PHOTO");
 
     private final String fileType;
 }

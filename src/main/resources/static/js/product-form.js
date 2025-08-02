@@ -74,28 +74,4 @@ $(function () {
 
         $('#attributeJson').val(JSON.stringify(attributes));
     });
-
-    // Product image preview
-    $('#productImage').on('change', function () {
-        const input = this;
-        const preview = $('#productImagePreview');
-
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                if (preview.length) {
-                    preview.attr('src', e.target.result);
-                } else {
-                    $('<img>', {
-                        id: 'productImagePreview',
-                        src: e.target.result,
-                        class: 'img-thumbnail mt-2',
-                        css: { maxHeight: '150px' },
-                        alt: 'Product Image'
-                    }).insertAfter(input);
-                }
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    });
 });

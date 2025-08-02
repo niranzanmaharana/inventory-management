@@ -46,6 +46,13 @@ public class ProductItem extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<ProductAttribute> attributes = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "supplier_id",
+            foreignKey = @ForeignKey(name = "FK_PRODUCT_X_SUPPLIER")
+    )
+    private Supplier supplier;
+
     public String getProductName() {
         return productName;
     }
@@ -116,5 +123,13 @@ public class ProductItem extends BaseEntity {
 
     public void setAttributes(Set<ProductAttribute> attributes) {
         this.attributes = attributes;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 }

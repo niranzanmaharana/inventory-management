@@ -41,6 +41,9 @@ public class ProductDto {
     @NotNull(message = "Category is required")
     private Long categoryId;
 
+    @NotNull(message = "Supplier is required")
+    private Long supplierId;
+
     private Map<Long, String> productAttributes = new HashMap<>();
 
     public Long getId() {
@@ -113,6 +116,14 @@ public class ProductDto {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
     }
 
     public Map<Long, String> getProductAttributes() {

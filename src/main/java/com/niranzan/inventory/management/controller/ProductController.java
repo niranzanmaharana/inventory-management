@@ -1,16 +1,17 @@
 package com.niranzan.inventory.management.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.niranzan.inventory.management.dto.ProductDto;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
+import com.niranzan.inventory.management.enums.ImageFileType;
 import com.niranzan.inventory.management.service.AttributeTypeService;
 import com.niranzan.inventory.management.service.CategoryService;
 import com.niranzan.inventory.management.service.ProductService;
+import com.niranzan.inventory.management.service.SupplierService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import com.niranzan.inventory.management.view.response.ProductResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,7 +41,8 @@ public class ProductController extends BaseController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final AttributeTypeService attributeTypeService;
-    private final ObjectMapper objectMapper;
+    private final SupplierService supplierService;
+    private final String DEFAULT_IMAGE_PATH = "/images/product-default-image.png";
 
     @GetMapping("/product-list")
     public String listProducts(Model model) {
@@ -67,7 +69,6 @@ public class ProductController extends BaseController {
     @PostMapping("/save")
     public String saveProduct(@Valid @ModelAttribute("product") ProductDto productDto,
                               BindingResult result,
-                              @RequestParam(name = "productImage", required = false) MultipartFile productImage,
                               @RequestParam("attributeJson") String attributeJson,
                               Model model,
                               RedirectAttributes attributes) {
@@ -76,18 +77,15 @@ public class ProductController extends BaseController {
             return PRODUCT_FORM_PATH.getPath();
         }
         try {
-            Map<Long, String> productAttributes = objectMapper.readValue(attributeJson, new TypeReference<>() {
-            });
-            productDto.setProductAttributes(productAttributes);
+            ProductDto savedProduct = productService.saveProduct(productDto, attributeJson);
+            attributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(),
+                    MessageFormatUtil.format("Product {} saved successfully", savedProduct.getProductName()));
+            return REDIRECT_URL.getPath() + PRODUCT_LIST_PATH.getPath();
         } catch (Exception e) {
-            result.reject("attribute.parse", "Failed to parse product attributes");
+            model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), e.getMessage());
             addModelAttributes(model, productDto);
             return PRODUCT_FORM_PATH.getPath();
         }
-        ProductDto savedProduct = productService.saveProduct(productDto, productImage);
-        attributes.addFlashAttribute(AppMessageParameter.SUCCESS_PARAM_NM.getName(),
-                MessageFormatUtil.format("Product {} saved successfully", savedProduct.getProductName()));
-        return REDIRECT_URL.getPath() + PRODUCT_LIST_PATH.getPath();
     }
 
     @GetMapping("/edit/{productId}")
@@ -95,6 +93,35 @@ public class ProductController extends BaseController {
         ProductDto productDto = productService.prepareDataForEdit(productId);
         addModelAttributes(model, productDto);
         return PRODUCT_FORM_PATH.getPath();
+    }
+
+    @PostMapping("/upload-image")
+    @ResponseBody
+    public ResponseEntity<String> uploadProductImage(
+            @RequestParam(name = "productId") Long productId,
+            @RequestParam(name = "imageType") String imageType,
+            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(productService.uploadImage(productId, imageType, file));
+    }
+
+    @PostMapping("/image-path")
+    @ResponseBody
+    public String getImagePath(@RequestParam Long id, @RequestParam String imageType) {
+        String imagePath = DEFAULT_IMAGE_PATH;
+        ProductDto product = productService.findById(id);
+        if (product == null || StringUtils.isBlank(imageType)) {
+            return imagePath;
+        }
+
+        String normalizedType = imageType.trim().toUpperCase();
+
+        if (ImageFileType.PRODUCT_PHOTO.name().equals(normalizedType)) {
+            imagePath = product.getProductImagePath();
+        } else if (ImageFileType.RECEIPT_PHOTO.name().equals(normalizedType)) {
+            imagePath = product.getInvoiceImagePath();
+        }
+
+        return StringUtils.defaultString(imagePath);
     }
 
     @PostMapping("/toggle-status/{id}")
@@ -112,6 +139,7 @@ public class ProductController extends BaseController {
     private void addModelAttributes(Model model, ProductDto productDto) {
         model.addAttribute("product", productDto);
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("suppliers", supplierService.findAll());
         model.addAttribute("attributeTypes", attributeTypeService.findAllAttributes());
         Map<String, String> attrMap = new HashMap<>();
         for (Map.Entry<Long, String> entry : productDto.getProductAttributes().entrySet()) {

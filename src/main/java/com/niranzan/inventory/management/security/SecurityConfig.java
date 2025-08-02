@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
 @Configuration
 @EnableWebSecurity
@@ -26,18 +25,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SpringSecurityDialect springSecurityDialect() {
-        return new SpringSecurityDialect();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                                 .requestMatchers("/register/**").permitAll()
-                                .requestMatchers("/index").permitAll()
                                 .requestMatchers("/user/**").hasRole("ADMIN")
                                 .requestMatchers("/home", "/profile/**").hasAnyRole("ADMIN", "STAFF", "MANAGER")
                                 .anyRequest().authenticated()

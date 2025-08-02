@@ -62,7 +62,7 @@
                                 style="background: none; font-size: 1.2rem;"
                                 th:title="${category.enabled} ? 'Disable' : 'Enable'"
                                 th:onclick="${category.enabled} ? 'return confirm(\'Disable this category?\')' : 'return confirm(\'Enable this category?\')'}">
-                                <i th:classappend="${category.enabled} ? 'bi-toggle-off' : 'bi-toggle-on'"></i>
+                                <i th:classappend="${category.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
                             </button>
                         </form>
 

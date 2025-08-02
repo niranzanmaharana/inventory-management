@@ -1,6 +1,8 @@
 <!-- templates/user/home.html -->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 <head th:replace="~{fragments/header :: head}"></head>
 
@@ -41,10 +43,17 @@
                                         th:text="${product.enabled} ? 'Enabled' : 'Disabled'">
                                         Status
                                     </span>
-                                    <a href="#" class="ms-2 view-image-link text-decoration-none"
-                                        title="View Product Image" th:if="${product.productImagePath}"
-                                        th:data-img-url="@{${product.productImagePath}}" data-title="Product Image">
-                                        <i class="bi bi-image" style="font-size: 1.2rem;"></i>
+                                    <a href="#" class="ms-2 image-action-link text-decoration-none position-relative"
+                                        title="View/Upload Product Image" th:data-product-id="${product.id}"
+                                        th:data-image-type="PRODUCT_PHOTO"
+                                        th:data-img-url="@{${product.productImagePath}}">
+                                        <i class="bi bi-image" style="font-size: 1.5rem;"></i>
+                                    </a>
+                                    <a href="#" class="ms-2 image-action-link text-decoration-none position-relative"
+                                        title="View/Upload Invoice Image" th:data-product-id="${product.id}"
+                                        th:data-image-type="RECEIPT_PHOTO"
+                                        th:data-img-url="@{${product.invoiceImagePath}}">
+                                        <i class="bi bi-receipt" style="font-size: 1.5rem;"></i>
                                     </a>
                                 </div>
 
@@ -64,7 +73,7 @@
                                             th:title="${product.enabled} ? 'Disable' : 'Enable'"
                                             th:onclick="${product.enabled} ? 'return confirm(\'Disable this product?\')' : 'return confirm(\'Enable this product?\')'}">
                                             <i
-                                                th:classappend="${product.enabled} ? 'bi-toggle-off' : 'bi-toggle-on'"></i>
+                                                th:classappend="${product.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -78,18 +87,34 @@
             </table>
         </div>
     </div>
-
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Upload Image Modal -->
+    <div class="modal fade" id="uploadImageModal" tabindex="-1" aria-labelledby="uploadImageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="uploadImageForm" enctype="multipart/form-data">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload Product Image ( < 100KB)</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="uploadProductId" name="productId">
+                        <input type="hidden" id="uploadImageType" name="imageType">
+                        <div class="mb-3">
+                            <label for="productImage" class="form-label">Choose Image</label>
+                            <input type="file" class="form-control" id="productImage" name="file" multiple
+                                accept="image/*" required>
+                        </div>
+                        <div id="uploadImagePreview" class="text-center">
+                            <img src="#" class="img-thumbnail" id="previewImage" style="max-height: 200px;">
+                        </div>
+                        <div id="uploadStatusMessage" class="text-center mt-2"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
                 </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" class="img-fluid" alt="Preview Image" style="max-height: 600px;">
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -98,26 +123,7 @@
     <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
-    <script>
-        $(document).ready(function () {
-            $('.view-image-link').on('click', function (e) {
-                e.preventDefault();
-
-                const imageUrl = $(this).data('img-url');
-                const title = $(this).data('title') || "Image Preview";
-
-                $('#modalImage').attr('src', imageUrl);
-                $('#imageModalLabel').text(title);
-                $('#imageModal').modal('show');
-            });
-
-            $('#imageModal').on('hide.bs.modal', function () {
-                if (document.activeElement) {
-                    document.activeElement.blur();
-                }
-            });
-        });
-    </script>
+    <script th:src="@{/js/product-list.js}"></script>
 </body>
 
 </html>

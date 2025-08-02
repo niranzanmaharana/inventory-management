@@ -1,11 +1,16 @@
 package com.niranzan.inventory.management.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.niranzan.inventory.management.dto.ProductDto;
 import com.niranzan.inventory.management.entity.AttributeType;
 import com.niranzan.inventory.management.entity.ProductAttribute;
 import com.niranzan.inventory.management.entity.ProductCategory;
 import com.niranzan.inventory.management.entity.ProductItem;
 import com.niranzan.inventory.management.enums.ImageFileType;
+import com.niranzan.inventory.management.exceptions.GenericException;
+import com.niranzan.inventory.management.exceptions.InvalidFormDataException;
 import com.niranzan.inventory.management.exceptions.ResourceNotFoundException;
 import com.niranzan.inventory.management.exceptions.UnableToSaveFileException;
 import com.niranzan.inventory.management.mapper.ProductMapper;
@@ -14,12 +19,17 @@ import com.niranzan.inventory.management.repository.CategoryRepository;
 import com.niranzan.inventory.management.repository.ProductRepository;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import com.niranzan.inventory.management.view.response.ProductResponse;
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintDeclarationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,12 +44,20 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
     private static final String MSG_PRODUCT_NOT_FOUND_WITH_ID = "Product not found with id: {}";
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
     private final AttributeTypeRepository attributeTypeRepository;
+    private final ObjectMapper objectMapper;
+
+    private final String UPLOAD_BASE_PATH = "uploads";
+    private final String TEMP_BASE_PATH = "temp";
+    private final String INVOICES_PATH = "invoices";
+    private final String IMAGES_PATH = "images";
+    private final String FOLDER_SEPARATOR = "/";
 
     @Value("${upload-path.invoices}")
     private String invoicePath;
@@ -69,40 +87,46 @@ public class ProductService {
                 .map(productMapper::toDto).toList();
     }
 
-    public ProductDto saveProduct(ProductDto productDto, MultipartFile productImage) {
+    @Transactional
+    public ProductDto saveProduct(ProductDto productDto, String attributeJson) {
         ProductItem product = Objects.isNull(productDto.getId()) ? new ProductItem()
-                : productRepository.findById(productDto.getId()).orElseThrow(() -> new RuntimeException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, String.valueOf(productDto.getId()))));
+                : productRepository.findById(productDto.getId())
+                .orElseThrow(() -> new RuntimeException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, String.valueOf(productDto.getId()))));
 
-        product.setProductName(productDto.getProductName());
-        product.setDescription(productDto.getDescription());
-        product.setQuantity(productDto.getQuantity());
-        product.setPricePerUnit(productDto.getPricePerUnit());
-        product.setExpiryDate(productDto.getExpiryDate());
+        try {
+            Map<Long, String> productAttributes = objectMapper.readValue(attributeJson, new TypeReference<>() {
+            });
+            productDto.setProductAttributes(productAttributes);
+            product.setProductName(productDto.getProductName());
+            product.setDescription(productDto.getDescription());
+            product.setQuantity(productDto.getQuantity());
+            product.setPricePerUnit(productDto.getPricePerUnit());
+            product.setExpiryDate(productDto.getExpiryDate());
 
-        // Load category
-        ProductCategory subCategory = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("SubCategory not found"));
-        product.setCategory(subCategory);
+            ProductCategory subCategory = categoryRepository.findById(productDto.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("SubCategory not found"));
+            product.setCategory(subCategory);
+            setupProductAttributes(productDto, product);
+            ProductItem savedProduct = productRepository.save(product);
 
-        // Save image if uploaded
-        uploadAndSetImageUrl(product, productImage, ImageFileType.PRODUCT_PHOTO);
-
-        // Prepare ProductAttributes
-        setupProductAttributes(productDto, product);
-
-        ProductItem savedProduct = productRepository.save(product);
-        return productMapper.toDto(savedProduct);
+            return productMapper.toDto(savedProduct);
+        } catch (JsonProcessingException exception) {
+            throw new InvalidFormDataException(MessageFormatUtil.format("Invalid attributes exception: {}", exception.getMessage()));
+        } catch (DataIntegrityViolationException | ConstraintDeclarationException exception) {
+            throw new InvalidFormDataException(extractException(exception));
+        } catch (Exception e) {
+            throw new GenericException(MessageFormatUtil.format("Unknown exception: {}", e.getMessage()));
+        }
     }
 
     private void uploadAndSetImageUrl(ProductItem product, MultipartFile file, ImageFileType imageFileType) {
         if (file != null && !file.isEmpty()) {
             try {
                 // Determine subdirectory based on image type
-                String subFolder = imageFileType == ImageFileType.RECEIPT_PHOTO ? "invoices" : "images";
+                String subFolder = imageFileType == ImageFileType.RECEIPT_PHOTO ? INVOICES_PATH : IMAGES_PATH;
 
-                // Base upload folder = ./uploads/
-                Path baseUploadDir = Paths.get("uploads", subFolder); // resolves to "uploads/invoices" or "uploads/images"
-                Files.createDirectories(baseUploadDir); // ensure directory exists
+                Path baseUploadDir = Paths.get(UPLOAD_BASE_PATH, subFolder);
+                Files.createDirectories(baseUploadDir);
 
                 // Generate unique filename
                 String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -111,12 +135,8 @@ public class ProductService {
                 // Save the file
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-                // Print absolute and relative paths
-                System.out.println("Absolute Path: " + filePath.toAbsolutePath());
-                System.out.println("Relative Web Path: /uploads/" + subFolder + "/" + fileName);
-
                 // Set relative path in entity
-                String relativePath = "/" + subFolder + "/" + fileName;
+                String relativePath = FOLDER_SEPARATOR + subFolder + FOLDER_SEPARATOR + fileName;
                 if (imageFileType == ImageFileType.RECEIPT_PHOTO) {
                     product.setInvoiceImagePath(relativePath);
                 } else if (imageFileType == ImageFileType.PRODUCT_PHOTO) {
@@ -128,15 +148,36 @@ public class ProductService {
         }
     }
 
+    private String uploadTemporaryImage(MultipartFile file, String imageType) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String subFolder = TEMP_BASE_PATH;
+
+                Path baseUploadDir = Paths.get(UPLOAD_BASE_PATH, subFolder);
+                Files.createDirectories(baseUploadDir);
+
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path filePath = baseUploadDir.resolve(fileName);
+
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                return FOLDER_SEPARATOR + subFolder + FOLDER_SEPARATOR + fileName;
+            } catch (IOException e) {
+                throw new UnableToSaveFileException("Failed to save image: " + e.getMessage());
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
     private void setupProductAttributes(ProductDto productDto, ProductItem product) {
         if (productDto.getProductAttributes() == null) {
-            product.getAttributes().clear(); // clear all if no attributes passed
+            product.getAttributes().clear();
             return;
         }
 
         // Get existing attributes (same instance)
         Set<ProductAttribute> existingAttributes = product.getAttributes();
-        existingAttributes.clear(); // clear existing entries
+        existingAttributes.clear();
 
         for (Map.Entry<Long, String> entry : productDto.getProductAttributes().entrySet()) {
             Long attrTypeId = entry.getKey();
@@ -186,5 +227,55 @@ public class ProductService {
                     return productMapper.toDto(product);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, id.toString())));
+    }
+
+    public String uploadImage(Long productId, String imageType, MultipartFile file) {
+        if (Objects.isNull(productId)) {
+            return uploadTemporaryImage(file, imageType);
+        }
+        ImageFileType imageFileType = ImageFileType.valueOf(imageType);
+
+        ProductItem product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, productId.toString())));
+
+        // Delete existing image if present
+        deleteIfImageExist(product, imageFileType);
+
+        uploadAndSetImageUrl(product, file, ImageFileType.valueOf(imageType));
+        product = productRepository.save(product);
+        return product.getProductImagePath();
+    }
+
+    private void deleteIfImageExist(ProductItem product, ImageFileType imageFileType) {
+        String relativePath = imageFileType == ImageFileType.RECEIPT_PHOTO ? product.getInvoiceImagePath() : product.getProductImagePath();
+        try {
+            if (!StringUtils.isBlank(relativePath)) {
+                Path filePath = Paths.get(UPLOAD_BASE_PATH, relativePath.replaceFirst("^/", ""));
+                File imageFile = filePath.toFile();
+
+                if (imageFile.exists() && imageFile.isFile()) {
+                    boolean deleted = imageFile.delete();
+                    if (!deleted) {
+                        log.warn("Failed to delete image file: {}", imageFile.getAbsolutePath());
+                    } else {
+                        log.info("Deleted existing image: {}", imageFile.getAbsolutePath());
+                    }
+                } else {
+                    log.warn("Image file not found: {}", imageFile.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error while deleting image file for path: {}", relativePath, e);
+        }
+    }
+
+    private String extractException(Exception ex) {
+        String message = ex.getMessage();
+        if (message.contains("Duplicate entry")) {
+            if (message.contains("UK_ProductItem_ProductName")) {
+                return "Product name already exists.";
+            }
+        }
+        return "A data integrity violation occurred.: " + ex.getMessage();
     }
 }

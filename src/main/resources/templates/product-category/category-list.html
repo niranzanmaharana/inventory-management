@@ -3,119 +3,98 @@
 
 <head th:replace="~{fragments/header :: head}"></head>
 
+<link rel="stylesheet" th:href="@{/css/category.css}">
+
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="container fade-in mt-4 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary">List of Registered Users</h2>
-            <a class="btn btn-success" th:href="@{/product-category/add}">
-                <i class="bi bi-person-plus-fill"></i> Add Category
-            </a>
+            <h2 class="text-primary">Registered Categories</h2>
+            <div class="mb-3">
+                <a class="btn btn-success" th:href="@{/product-category/add}">
+                    <i class="bi bi-plus"></i> Add Category
+                </a>
+            </div>
         </div>
 
         <div th:replace="~{fragments/message :: message}"></div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover mt-3 shadow-sm">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Subcategories</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="category : ${categories}">
-                        <!-- Category Name with Status Badge + Actions -->
-                        <td>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span th:text="${category.categoryName}"
-                                        th:classappend="${!category.enabled} ? 'text-muted text-decoration-line-through' : ''">
-                                        Category Name
-                                    </span>
-                                    <span class="badge ms-2"
-                                        th:classappend="${category.enabled} ? 'bg-success' : 'bg-secondary'"
-                                        th:text="${category.enabled} ? 'Enabled' : 'Disabled'">
-                                        Status
-                                    </span>
-                                </div>
-                                <div class="ms-2">
-                                    <!-- Edit -->
-                                    <a th:href="@{'/product-category/edit/' + ${category.id}}" class="text-primary me-2"
-                                        title="Edit Category" style="text-decoration: none; font-size: 0.9rem;">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-
-                                    <!-- Enable/Disable -->
-                                    <form
-                                        th:action="@{${category.enabled} ? '/product-category/disable/' + ${category.id} : '/product-category/enable/' + ${category.id}}"
-                                        method="post" style="display:inline;">
-                                        <button type="submit" class="btn p-0 border-0"
-                                            th:classappend="${category.enabled} ? 'text-danger' : 'text-success'"
-                                            style="background: none; font-size: 1.2rem;"
-                                            th:title="${category.enabled} ? 'Disable' : 'Enable'"
-                                            th:onclick="${category.enabled} ? 'return confirm(\'Disable this category?\')' : 'return confirm(\'Enable this category?\')'}">
-                                            <i
-                                                th:classappend="${category.enabled} ? 'bi-toggle-off' : 'bi-toggle-on'"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </td>
-
-                        <!-- Description -->
-                        <td th:text="${category.description}">Description</td>
-
-                        <!-- Subcategories -->
-                        <td>
-                            <ul class="mb-0 ps-3" th:if="${category.subCategories != null}">
-                                <li th:each="subCategory : ${category.subCategories}"
-                                    class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span th:text="${subCategory.categoryName}"
-                                            th:classappend="${!subCategory.enabled} ? 'text-muted text-decoration-line-through' : ''">
-                                            Subcategory Name
-                                        </span>
-                                        <span class="badge ms-2"
-                                            th:classappend="${subCategory.enabled} ? 'bg-success' : 'bg-secondary'"
-                                            th:text="${subCategory.enabled} ? 'Enabled' : 'Disabled'">
-                                            Status
-                                        </span>
-                                    </div>
-                                    <div class="ms-2">
-                                        <!-- Edit -->
-                                        <a th:href="@{'/product-category/edit/' + ${subCategory.id}}"
-                                            class="text-primary me-2" title="Edit Subcategory"
-                                            style="text-decoration: none; font-size: 0.9rem;">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-
-                                        <!-- Enable/Disable -->
-                                        <form
-                                            th:action="@{${subCategory.enabled} ? '/product-category/disable/' + ${subCategory.id} : '/product-category/enable/' + ${subCategory.id}}"
-                                            method="post" style="display:inline;">
-                                            <button type="submit" class="btn p-0 border-0"
-                                                th:classappend="${subCategory.enabled} ? 'text-danger' : 'text-success'"
-                                                style="background: none; font-size: 1.2rem;"
-                                                th:title="${subCategory.enabled} ? 'Disable' : 'Enable'"
-                                                th:onclick="${subCategory.enabled} ? 'return confirm(\'Disable this subcategory?\')' : 'return confirm(\'Enable this subcategory?\')'}">
-                                                <i
-                                                    th:classappend="${subCategory.enabled} ? 'bi-toggle-off' : 'bi-toggle-on'"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Category Tree -->
+        <div class="container mt-4">
+            <div>
+                <button id="expandAllBtn" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="bi bi-plus-square"></i> Expand All
+                </button>
+                <button id="collapseAllBtn" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-dash-square"></i> Collapse All
+                </button>
+            </div>
+            <div th:replace="~{::categoryTreeFragment(${categoryTree}, 0)}"></div>
         </div>
+
+        <!-- Recursive Fragment -->
+        <th:block th:fragment="categoryTreeFragment(categoryList, level)">
+            <ul class="category-tree">
+                <li th:each="category, iterStat : ${categoryList}">
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Toggle Icon -->
+                        <span th:if="${category.subCategories != null and !category.subCategories.isEmpty()}"
+                            class="toggle-icon" th:text="'−'"
+                            th:attr="data-target='#collapse-' + ${level} + '-' + ${iterStat.index}"
+                            th:id="'toggle-' + ${level} + '-' + ${iterStat.index}">
+                        </span>
+
+                        <!-- Spacer if no children -->
+                        <span th:if="${category.subCategories == null or category.subCategories.isEmpty()}"
+                            class="toggle-icon">&nbsp;</span>
+
+                        <!-- Category Name -->
+                        <span th:text="${category.categoryName}" th:classappend="${category.leaf} ? 'leaf' : ''"
+                            class="category-name">
+                        </span>
+
+                        <!-- Enable/Disable -->
+                        <form th:action="@{/product-category/toggle-status/{id}(id=${category.id})}" method="post"
+                            style="display:inline;">
+                            <button type="submit" class="btn p-0 border-0"
+                                th:classappend="${category.enabled} ? 'text-danger' : 'text-success'"
+                                style="background: none; font-size: 1.2rem;"
+                                th:title="${category.enabled} ? 'Disable' : 'Enable'"
+                                th:onclick="${category.enabled} ? 'return confirm(\'Disable this category?\')' : 'return confirm(\'Enable this category?\')'}">
+                                <i th:classappend="${category.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+                            </button>
+                        </form>
+
+                        <!-- Add a sub category to it -->
+                        <a th:href="@{/product-category/add(parentId=${category.id})}"
+                            class="text-success ms-2" title="Add a subcategory to it"
+                            style="font-size: 0.95rem; text-decoration: none;">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+
+                        <!-- Edit -->
+                        <a th:href="@{'/product-category/edit/' + ${category.id}}" class="text-primary me-2"
+                            title="Edit Category" style="text-decoration: none; font-size: 0.9rem;">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+
+                    <!-- Subcategories -->
+                    <div class="collapse show ms-4" th:id="'collapse-' + ${level} + '-' + ${iterStat.index}">
+                        <div th:replace="~{::categoryTreeFragment(${category.subCategories}, ${level + 1})}"></div>
+                    </div>
+                </li>
+            </ul>
+        </th:block>
     </div>
+
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/category.js}"></script>
 </body>
-<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 </html>

@@ -3,13 +3,13 @@ package com.niranzan.inventory.management.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "sales_transaction_record")
-public class SalesTransactionRecord extends BaseEntity {
+@Table(name = "sales_transaction_item")
+public class SalesTransactionItem extends BaseEntity {
     @ManyToOne(optional = false)
     @JoinColumn(
-            name = "sale_id",
+            name = "sales_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_SALE_PARENT")
+            foreignKey = @ForeignKey(name = "FK_SALE_TX_ITEM_X_SALES_TX")
     )
     private SalesTransaction salesTransaction;
 
@@ -17,7 +17,7 @@ public class SalesTransactionRecord extends BaseEntity {
     @JoinColumn(
             name = "product_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_SALES_TX_PRODUCT_PARENT")
+            foreignKey = @ForeignKey(name = "FK_SALES_TX_X_PRODUCT")
     )
     private ProductItem productItem;
 

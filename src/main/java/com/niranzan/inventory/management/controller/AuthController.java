@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
-import static com.niranzan.inventory.management.enums.AppPages.REGISTRATION_PAGE;
+import static com.niranzan.inventory.management.enums.AppPages.REGISTRATION_PATH;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class AuthController extends BaseController {
     @GetMapping("/register")
     public String registration(Model model) {
         model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, new UserProfileDto());
-        return REGISTRATION_PAGE.getPageName();
+        return REGISTRATION_PATH.getPath();
     }
 
     @PostMapping("/register")
@@ -47,7 +47,7 @@ public class AuthController extends BaseController {
                                RedirectAttributes attributes) {
         if (result.hasErrors()) {
             model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, userProfileDto);
-            return REGISTRATION_PAGE.getPageName();
+            return REGISTRATION_PATH.getPath();
         }
 
         try {
@@ -61,10 +61,10 @@ public class AuthController extends BaseController {
         } catch (Exception ex) {
             model.addAttribute(AppMessageParameter.ERROR_PARAM_NM.getName(), "An unexpected error occurred: " + ex.getMessage());
             model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, userProfileDto);
-            return REGISTRATION_PAGE.getPageName();
+            return REGISTRATION_PATH.getPath();
         }
 
-        return REDIRECT_URL.getPageName() + REGISTRATION_PAGE.getPageName();
+        return REDIRECT_URL.getPath() + REGISTRATION_PATH.getPath();
     }
 
     private static String extractException(UserProfileDto userProfileDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
@@ -86,6 +86,6 @@ public class AuthController extends BaseController {
         }
 
         model.addAttribute(MODEL_ATTR_PLACEHOLDER_FOR_USER_PROFILE, userProfileDto);
-        return REGISTRATION_PAGE.getPageName();
+        return REGISTRATION_PATH.getPath();
     }
 }

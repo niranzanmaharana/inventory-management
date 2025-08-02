@@ -1,6 +1,20 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "product_item", uniqueConstraints = {
@@ -12,19 +26,32 @@ public class ProductItem extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String description;
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal pricePerUnit;
     @Column(nullable = false)
-    private Integer availableQty;
+    private Integer quantity;
+    private LocalDate expiryDate;
     @Column(length = 300)
-    private String imageUrl;
+    private String invoiceImagePath;
+    @Column(length = 300)
+    private String productImagePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "category_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_PRODUCT_ITEM_CATEGORY_PARENT")
+            foreignKey = @ForeignKey(name = "FK_PRODUCT_X_CATEGORY")
     )
     private ProductCategory category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<ProductAttribute> attributes = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "supplier_id",
+            foreignKey = @ForeignKey(name = "FK_PRODUCT_X_SUPPLIER")
+    )
+    private Supplier supplier;
 
     public String getProductName() {
         return productName;
@@ -42,28 +69,44 @@ public class ProductItem extends BaseEntity {
         this.description = description;
     }
 
-    public Double getPrice() {
-        return price;
+    public BigDecimal getPricePerUnit() {
+        return pricePerUnit;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setPricePerUnit(BigDecimal pricePerUnit) {
+        this.pricePerUnit = pricePerUnit;
     }
 
-    public Integer getAvailableQty() {
-        return availableQty;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setAvailableQty(Integer availableQty) {
-        this.availableQty = availableQty;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getInvoiceImagePath() {
+        return invoiceImagePath;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setInvoiceImagePath(String invoiceImagePath) {
+        this.invoiceImagePath = invoiceImagePath;
+    }
+
+    public String getProductImagePath() {
+        return productImagePath;
+    }
+
+    public void setProductImagePath(String productImagePath) {
+        this.productImagePath = productImagePath;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public ProductCategory getCategory() {
@@ -72,5 +115,21 @@ public class ProductItem extends BaseEntity {
 
     public void setCategory(ProductCategory category) {
         this.category = category;
+    }
+
+    public Set<ProductAttribute> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Set<ProductAttribute> attributes) {
+        this.attributes = attributes;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 }

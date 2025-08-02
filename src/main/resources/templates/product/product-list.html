@@ -1,0 +1,129 @@
+<!-- templates/user/home.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-primary">List of Products</h2>
+            <a class="btn btn-success" th:href="@{/product/add}">
+                <i class="bi bi-plus"></i> Add New Product
+            </a>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Subcategory</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product: ${products}">
+                        <td>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span th:text="${product.productName}"
+                                        th:classappend="${!product.enabled} ? 'text-muted text-decoration-line-through' : ''">
+                                        Product Name
+                                    </span>
+                                    <span class="badge ms-2"
+                                        th:classappend="${product.enabled} ? 'bg-success' : 'bg-secondary'"
+                                        th:text="${product.enabled} ? 'Enabled' : 'Disabled'">
+                                        Status
+                                    </span>
+                                    <a href="#" class="ms-2 image-action-link text-decoration-none position-relative"
+                                        title="View/Upload Product Image" th:data-product-id="${product.id}"
+                                        th:data-image-type="PRODUCT_PHOTO"
+                                        th:data-img-url="@{${product.productImagePath}}">
+                                        <i class="bi bi-image" style="font-size: 1.5rem;"></i>
+                                    </a>
+                                    <a href="#" class="ms-2 image-action-link text-decoration-none position-relative"
+                                        title="View/Upload Invoice Image" th:data-product-id="${product.id}"
+                                        th:data-image-type="RECEIPT_PHOTO"
+                                        th:data-img-url="@{${product.invoiceImagePath}}">
+                                        <i class="bi bi-receipt" style="font-size: 1.5rem;"></i>
+                                    </a>
+                                </div>
+
+                                <div class="ms-2">
+                                    <!-- Edit -->
+                                    <a th:href="@{'/product/edit/' + ${product.id}}" class="text-primary me-2"
+                                        title="Edit product" style="text-decoration: none; font-size: 0.9rem;">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <!-- Enable/Disable -->
+                                    <form th:action="@{/product/toggle-status/{id}(id=${product.id})}" method="post"
+                                        style="display:inline;">
+                                        <button type="submit" class="btn p-0 border-0"
+                                            th:classappend="${product.enabled} ? 'text-danger' : 'text-success'"
+                                            style="background: none; font-size: 1.2rem;"
+                                            th:title="${product.enabled} ? 'Disable' : 'Enable'"
+                                            th:onclick="${product.enabled} ? 'return confirm(\'Disable this product?\')' : 'return confirm(\'Enable this product?\')'}">
+                                            <i
+                                                th:classappend="${product.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${product.description}"></td>
+                        <td th:text="${product.categoryName}"></td>
+                        <td th:text="${product.subCategoryName}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Upload Image Modal -->
+    <div class="modal fade" id="uploadImageModal" tabindex="-1" aria-labelledby="uploadImageModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="uploadImageForm" enctype="multipart/form-data">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload Product Image ( < 100KB)</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="uploadProductId" name="productId">
+                        <input type="hidden" id="uploadImageType" name="imageType">
+                        <div class="mb-3">
+                            <label for="productImage" class="form-label">Choose Image</label>
+                            <input type="file" class="form-control" id="productImage" name="file" multiple
+                                accept="image/*" required>
+                        </div>
+                        <div id="uploadImagePreview" class="text-center">
+                            <img src="#" class="img-thumbnail" id="previewImage" style="max-height: 200px;">
+                        </div>
+                        <div id="uploadStatusMessage" class="text-center mt-2"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
+    <script th:src="@{/js/product-list.js}"></script>
+</body>
+
+</html>

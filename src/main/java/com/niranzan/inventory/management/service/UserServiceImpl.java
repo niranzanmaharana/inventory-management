@@ -9,18 +9,21 @@ import com.niranzan.inventory.management.exceptions.ResourceNotFoundException;
 import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.repository.RoleRepository;
 import com.niranzan.inventory.management.repository.UserRepository;
+import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.niranzan.inventory.management.config.AppMessage.MSG_PROVIDE_A_VALID_PASSWORD;
+import static com.niranzan.inventory.management.config.AppMessage.MSG_USER_NOT_FOUND_WITH_ID;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static final String USER_NOT_FOUND_WITH_ID = "UserProfile not found with id: ";
-    private final UserRepository UserRepository;
-    private final RoleRepository RoleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -28,32 +31,32 @@ public class UserServiceImpl implements UserService {
     public UserProfile saveUser(UserProfileDto userProfileDto) {
         UserProfile userProfile = userMapper.toEntity(userProfileDto);
         userProfile.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));
-        UserRole userRole = RoleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
+        UserRole userRole = roleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
         if (userRole == null) {
             userRole = addNewRole(userProfileDto.getUserRole().getRoleName());
         }
         userProfile.setUserRole(userRole);
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public UserProfile findUserByEmail(String email) {
-        return UserRepository.findByEmail(email);
+        return userRepository.findByEmail(email);
     }
 
     @Override
     public UserProfile findUserByMobile(String mobile) {
-        return UserRepository.findByMobile(mobile);
+        return userRepository.findByMobile(mobile);
     }
 
     @Override
     public UserProfile findUserByUsername(String username) {
-        return UserRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 
     @Override
     public List<UserProfileDto> findAllUsers() {
-        List<UserProfile> userProfiles = UserRepository.findAll();
+        List<UserProfile> userProfiles = userRepository.findAll();
         return userProfiles.stream()
                 .map(userMapper::toDto)
                 .toList();
@@ -61,50 +64,50 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfile updateUser(UserProfileDto userProfileDto) {
-        UserProfile userProfile = UserRepository.findById(userProfileDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + userProfileDto.getId()));
+        UserProfile userProfile = userRepository.findById(userProfileDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(userProfileDto.getId()))));
 
         updateUser(userProfileDto, userProfile);
 
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public UserProfile updateProfile(ProfileDto profileDto) {
-        UserProfile userProfile = UserRepository.findById(profileDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + profileDto.getId()));
+        UserProfile userProfile = userRepository.findById(profileDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(profileDto.getId()))));
 
         updateProfile(profileDto, userProfile);
 
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public UserProfile findById(long id) {
-        return UserRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + id));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(id))));
     }
 
     @Override
     public UserProfile toggleUserStatus(long id) {
-        UserProfile userProfile = UserRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + id));
+        UserProfile userProfile = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(id))));
 
         userProfile.setEnabled(!userProfile.isEnabled());
-        return UserRepository.save(userProfile);
+        return userRepository.save(userProfile);
     }
 
     @Override
     public void changePassword(long id, String currentPassword, String newPassword) {
-        UserProfile userProfile = UserRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("UserProfile not found: " + id));
+        UserProfile userProfile = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(id))));
 
         if (!passwordEncoder.matches(currentPassword, userProfile.getPassword())) {
-            throw new PasswordMismatchException("Please provide the correct current password");
+            throw new PasswordMismatchException(MSG_PROVIDE_A_VALID_PASSWORD.getMessage());
         }
 
         userProfile.setPassword(passwordEncoder.encode(newPassword));
-        UserRepository.save(userProfile);
+        userRepository.save(userProfile);
     }
 
     private void updateUser(UserProfileDto userProfileDto, UserProfile userProfile) {
@@ -115,7 +118,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setMobile(userProfileDto.getMobile());
         userProfile.setEmail(userProfileDto.getEmail());
         userProfile.setDob(userProfileDto.getDob());
-        UserRole userRole = RoleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
+        UserRole userRole = roleRepository.findByRoleName(userProfileDto.getUserRole().getRoleName());
         if (userRole == null) {
             userRole = addNewRole(userProfileDto.getUserRole().getRoleName());
         }
@@ -135,6 +138,6 @@ public class UserServiceImpl implements UserService {
     private UserRole addNewRole(String roleName) {
         UserRole userRole = new UserRole();
         userRole.setRoleName(roleName);
-        return RoleRepository.save(userRole);
+        return roleRepository.save(userRole);
     }
 }

@@ -51,7 +51,7 @@ public class UserProfile extends BaseEntity {
     @JoinColumn(
             name = "role_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "FK_ROLE_PARENT")
+            foreignKey = @ForeignKey(name = "FK_USER_PROFILE_X_ROLE")
     )
     private UserRole userRole;
 

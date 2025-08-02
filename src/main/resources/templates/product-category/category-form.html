@@ -42,12 +42,12 @@
                         <!-- Parent Category -->
                         <div class="mb-3">
                             <label for="parentId" class="form-label">Parent Category</label>
-                            <span th:text="${category.parentId}"></span>
                             <select class="form-select" th:field="*{parentId}" id="parentId"
                                 th:disabled="${category.parentId == null and hasSubCategories}">
                                 <option value="">-- None --</option>
-                                <option th:each="parent : ${parentCategories}" th:value="${parent.id}"
-                                    th:selected="${parent.id} == ${category.parentId}" th:text="${parent.categoryName}">
+                                <option th:each="parent : ${categories}" th:value="${parent.id}"
+                                    th:selected="${parent.id} == ${category.parentId}"
+                                    th:text="${parent.categoryName + (parent.leaf ? ' 🌿' : '')}">
                                 </option>
                             </select>
                             <div th:if="${category.parentId == null and hasSubCategories}"

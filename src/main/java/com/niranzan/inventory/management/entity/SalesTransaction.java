@@ -19,7 +19,7 @@ public class SalesTransaction extends BaseEntity {
     private Double totalAmount;
 
     @OneToMany(mappedBy = "salesTransaction", cascade = CascadeType.ALL)
-    private Set<SalesTransactionRecord> items = new HashSet<>();
+    private Set<SalesTransactionItem> items = new HashSet<>();
 
     public String getCustomerName() {
         return customerName;
@@ -45,11 +45,11 @@ public class SalesTransaction extends BaseEntity {
         this.totalAmount = totalAmount;
     }
 
-    public Set<SalesTransactionRecord> getItems() {
+    public Set<SalesTransactionItem> getItems() {
         return items;
     }
 
-    public void setItems(Set<SalesTransactionRecord> items) {
+    public void setItems(Set<SalesTransactionItem> items) {
         this.items = items;
     }
 }

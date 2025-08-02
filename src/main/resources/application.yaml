@@ -42,5 +42,10 @@ logging:
     com.niranzan.inventory: DEBUG
 
 upload-path:
+  base: uploads
   invoices: invoices
   images: images
+  temp: temp
+
+default:
+  image-path: /images/product-default-image.png

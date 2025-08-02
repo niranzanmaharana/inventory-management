@@ -9,16 +9,19 @@ import com.niranzan.inventory.management.exceptions.ResourceNotFoundException;
 import com.niranzan.inventory.management.mapper.UserMapper;
 import com.niranzan.inventory.management.repository.RoleRepository;
 import com.niranzan.inventory.management.repository.UserRepository;
+import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.niranzan.inventory.management.config.AppMessage.MSG_PROVIDE_A_VALID_PASSWORD;
+import static com.niranzan.inventory.management.config.AppMessage.MSG_USER_NOT_FOUND_WITH_ID;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static final String USER_NOT_FOUND_WITH_ID = "UserProfile not found with id: ";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -62,7 +65,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfile updateUser(UserProfileDto userProfileDto) {
         UserProfile userProfile = userRepository.findById(userProfileDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + userProfileDto.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(userProfileDto.getId()))));
 
         updateUser(userProfileDto, userProfile);
 
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfile updateProfile(ProfileDto profileDto) {
         UserProfile userProfile = userRepository.findById(profileDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + profileDto.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(profileDto.getId()))));
 
         updateProfile(profileDto, userProfile);
 
@@ -82,13 +85,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfile findById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + id));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(id))));
     }
 
     @Override
     public UserProfile toggleUserStatus(long id) {
         UserProfile userProfile = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_WITH_ID + id));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(id))));
 
         userProfile.setEnabled(!userProfile.isEnabled());
         return userRepository.save(userProfile);
@@ -97,10 +100,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(long id, String currentPassword, String newPassword) {
         UserProfile userProfile = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("UserProfile not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_USER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(id))));
 
         if (!passwordEncoder.matches(currentPassword, userProfile.getPassword())) {
-            throw new PasswordMismatchException("Please provide the correct current password");
+            throw new PasswordMismatchException(MSG_PROVIDE_A_VALID_PASSWORD.getMessage());
         }
 
         userProfile.setPassword(passwordEncoder.encode(newPassword));

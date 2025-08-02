@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class ProductDto {
     private Long id;
-    @NotEmpty(message = "Description is required")
+    @NotEmpty(message = "Product name is required")
     @Size(max = 100, message = "Product name must be less than 100 characters")
     private String productName;
 

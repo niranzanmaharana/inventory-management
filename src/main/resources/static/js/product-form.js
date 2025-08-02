@@ -8,7 +8,7 @@ $(function () {
         minDate: 0
     });
 
-    // Enable input if checkbox is already checked
+    // Enable input if checkbox is already checked (initial setup)
     $('.attribute-checkbox').each(function () {
         const attrId = $(this).data('attr-id');
         const input = $('#attrInput_' + attrId);
@@ -17,6 +17,26 @@ $(function () {
             input.prop('required', true);
         }
     });
+
+    // ✅ NEW: Restore attribute values from JSON if form reloaded with errors
+    const attributeJsonVal = $('#attributeJson').val();
+    if (attributeJsonVal) {
+        try {
+            const attributes = JSON.parse(attributeJsonVal);
+            Object.keys(attributes).forEach(attrId => {
+                const checkbox = $('#attrCheck_' + attrId);
+                const input = $('#attrInput_' + attrId);
+                const value = attributes[attrId];
+
+                if (checkbox.length && input.length) {
+                    checkbox.prop('checked', true);
+                    input.val(value).prop('disabled', false).prop('required', true);
+                }
+            });
+        } catch (e) {
+            console.error("Failed to parse attribute JSON:", e);
+        }
+    }
 
     // Toggle input field on checkbox change
     $('.attribute-checkbox').change(function () {

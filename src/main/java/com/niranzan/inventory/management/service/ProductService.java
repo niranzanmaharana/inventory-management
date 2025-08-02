@@ -8,6 +8,7 @@ import com.niranzan.inventory.management.entity.AttributeType;
 import com.niranzan.inventory.management.entity.ProductAttribute;
 import com.niranzan.inventory.management.entity.ProductCategory;
 import com.niranzan.inventory.management.entity.ProductItem;
+import com.niranzan.inventory.management.entity.Supplier;
 import com.niranzan.inventory.management.enums.ImageFileType;
 import com.niranzan.inventory.management.exceptions.GenericException;
 import com.niranzan.inventory.management.exceptions.InvalidFormDataException;
@@ -17,6 +18,7 @@ import com.niranzan.inventory.management.mapper.ProductMapper;
 import com.niranzan.inventory.management.repository.AttributeTypeRepository;
 import com.niranzan.inventory.management.repository.CategoryRepository;
 import com.niranzan.inventory.management.repository.ProductRepository;
+import com.niranzan.inventory.management.repository.SupplierRepository;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import com.niranzan.inventory.management.view.response.ProductResponse;
 import jakarta.transaction.Transactional;
@@ -42,27 +44,32 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.niranzan.inventory.management.config.AppMessage.MSG_CATEGORY_NOT_FOUND_WITH_ID;
+import static com.niranzan.inventory.management.config.AppMessage.MSG_INVALID_ATTRIBUTES_EXCEPTION;
+import static com.niranzan.inventory.management.config.AppMessage.MSG_PRODUCT_NOT_FOUND_WITH_ID;
+import static com.niranzan.inventory.management.config.AppMessage.MSG_SUPPLIER_NOT_FOUND_WITH_ID;
+import static com.niranzan.inventory.management.config.AppMessage.MSG_UNKNOWN_EXCEPTION;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService {
-    private static final String MSG_PRODUCT_NOT_FOUND_WITH_ID = "Product not found with id: {}";
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final SupplierRepository supplierRepository;
     private final ProductMapper productMapper;
     private final AttributeTypeRepository attributeTypeRepository;
     private final ObjectMapper objectMapper;
 
-    private final String UPLOAD_BASE_PATH = "uploads";
-    private final String TEMP_BASE_PATH = "temp";
-    private final String INVOICES_PATH = "invoices";
-    private final String IMAGES_PATH = "images";
-    private final String FOLDER_SEPARATOR = "/";
-
+    @Value("${upload-path.base}")
+    private String uploadFolderPath;
+    @Value("${upload-path.temp}")
+    private String temporaryFolderPath;
     @Value("${upload-path.invoices}")
-    private String invoicePath;
+    private String invoiceFolderPath;
     @Value("${upload-path.images}")
-    private String productImagePath;
+    private String imagesFolderPath;
+    private final String FOLDER_SEPARATOR = "/";
 
     public List<ProductResponse> findAll() {
         return productRepository.findAll().stream().map(product -> {
@@ -91,7 +98,11 @@ public class ProductService {
     public ProductDto saveProduct(ProductDto productDto, String attributeJson) {
         ProductItem product = Objects.isNull(productDto.getId()) ? new ProductItem()
                 : productRepository.findById(productDto.getId())
-                .orElseThrow(() -> new RuntimeException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, String.valueOf(productDto.getId()))));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productDto.getId()))));
+        Supplier supplier = supplierRepository.findById(productDto.getSupplierId())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_SUPPLIER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productDto.getSupplierId()))));
+        ProductCategory subCategory = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_CATEGORY_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productDto.getCategoryId()))));
 
         try {
             Map<Long, String> productAttributes = objectMapper.readValue(attributeJson, new TypeReference<>() {
@@ -102,20 +113,18 @@ public class ProductService {
             product.setQuantity(productDto.getQuantity());
             product.setPricePerUnit(productDto.getPricePerUnit());
             product.setExpiryDate(productDto.getExpiryDate());
-
-            ProductCategory subCategory = categoryRepository.findById(productDto.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("SubCategory not found"));
+            product.setSupplier(supplier);
             product.setCategory(subCategory);
             setupProductAttributes(productDto, product);
             ProductItem savedProduct = productRepository.save(product);
 
             return productMapper.toDto(savedProduct);
         } catch (JsonProcessingException exception) {
-            throw new InvalidFormDataException(MessageFormatUtil.format("Invalid attributes exception: {}", exception.getMessage()));
+            throw new InvalidFormDataException(MessageFormatUtil.format(MSG_INVALID_ATTRIBUTES_EXCEPTION.getMessage(), exception.getMessage()));
         } catch (DataIntegrityViolationException | ConstraintDeclarationException exception) {
             throw new InvalidFormDataException(extractException(exception));
         } catch (Exception e) {
-            throw new GenericException(MessageFormatUtil.format("Unknown exception: {}", e.getMessage()));
+            throw new GenericException(MessageFormatUtil.format(MSG_UNKNOWN_EXCEPTION.getMessage(), e.getMessage()));
         }
     }
 
@@ -123,9 +132,9 @@ public class ProductService {
         if (file != null && !file.isEmpty()) {
             try {
                 // Determine subdirectory based on image type
-                String subFolder = imageFileType == ImageFileType.RECEIPT_PHOTO ? INVOICES_PATH : IMAGES_PATH;
+                String subFolder = imageFileType == ImageFileType.RECEIPT_PHOTO ? invoiceFolderPath : imagesFolderPath;
 
-                Path baseUploadDir = Paths.get(UPLOAD_BASE_PATH, subFolder);
+                Path baseUploadDir = Paths.get(uploadFolderPath, subFolder);
                 Files.createDirectories(baseUploadDir);
 
                 // Generate unique filename
@@ -148,12 +157,12 @@ public class ProductService {
         }
     }
 
-    private String uploadTemporaryImage(MultipartFile file, String imageType) {
+    private String uploadTemporaryImage(MultipartFile file) {
         if (file != null && !file.isEmpty()) {
             try {
-                String subFolder = TEMP_BASE_PATH;
+                String subFolder = temporaryFolderPath;
 
-                Path baseUploadDir = Paths.get(UPLOAD_BASE_PATH, subFolder);
+                Path baseUploadDir = Paths.get(uploadFolderPath, subFolder);
                 Files.createDirectories(baseUploadDir);
 
                 String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -212,7 +221,7 @@ public class ProductService {
     public ProductDto findById(Long productId) {
         return productRepository.findById(productId)
                 .map(productMapper::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format("Product not found with id: {}", String.valueOf(productId))));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productId))));
     }
 
     public boolean productExistsById(Long productId) {
@@ -226,17 +235,17 @@ public class ProductService {
                     product = productRepository.save(product);
                     return productMapper.toDto(product);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, id.toString())));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID.getMessage(), id.toString())));
     }
 
     public String uploadImage(Long productId, String imageType, MultipartFile file) {
         if (Objects.isNull(productId)) {
-            return uploadTemporaryImage(file, imageType);
+            return uploadTemporaryImage(file);
         }
         ImageFileType imageFileType = ImageFileType.valueOf(imageType);
 
         ProductItem product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID, productId.toString())));
+                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID.getMessage(), productId.toString())));
 
         // Delete existing image if present
         deleteIfImageExist(product, imageFileType);
@@ -250,7 +259,7 @@ public class ProductService {
         String relativePath = imageFileType == ImageFileType.RECEIPT_PHOTO ? product.getInvoiceImagePath() : product.getProductImagePath();
         try {
             if (!StringUtils.isBlank(relativePath)) {
-                Path filePath = Paths.get(UPLOAD_BASE_PATH, relativePath.replaceFirst("^/", ""));
+                Path filePath = Paths.get(uploadFolderPath, relativePath.replaceFirst("^/", ""));
                 File imageFile = filePath.toFile();
 
                 if (imageFile.exists() && imageFile.isFile()) {

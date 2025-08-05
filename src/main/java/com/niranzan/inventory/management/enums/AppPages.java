@@ -29,8 +29,7 @@ public enum AppPages {
     PRODUCT_LIST_PATH("product/product-list"),
     // purchase order pages
     PURCHASE_ORDER_FORM_PATH("purchase-order/purchase-order-form"),
-
-    PURCHASE_ORDER_LIST_PATH("purchase-order/purchase-order/list");
+    PURCHASE_ORDER_LIST_PATH("purchase-order/purchase-order-list");
 
     private final String path;
 }

@@ -11,25 +11,21 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product_item", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "productName", name = "UK_ProductItem_ProductName")
+        @UniqueConstraint(columnNames = "product_name", name = "UK_PRODUCT_NAME"),
+        @UniqueConstraint(columnNames = "product_code", name = "UK_PRODUCT_CODE")
 })
 public class ProductItem extends BaseEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String productName;
+    @Column(nullable = false, unique = true, length = 100)
+    private String productCode;
     @Column(nullable = false, length = 200)
     private String description;
-    @Column(nullable = false)
-    private BigDecimal pricePerUnit;
-    @Column(nullable = false)
-    private Integer quantity;
-    private LocalDate expiryDate;
     @Column(length = 300)
     private String invoiceImagePath;
     @Column(length = 300)
@@ -44,14 +40,7 @@ public class ProductItem extends BaseEntity {
     private ProductCategory category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<ProductAttribute> attributes = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "supplier_id",
-            foreignKey = @ForeignKey(name = "FK_PRODUCT_X_SUPPLIER")
-    )
-    private Supplier supplier;
+    private List<ProductAttribute> attributes = new ArrayList<>();
 
     public String getProductName() {
         return productName;
@@ -61,28 +50,20 @@ public class ProductItem extends BaseEntity {
         this.productName = productName;
     }
 
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public BigDecimal getPricePerUnit() {
-        return pricePerUnit;
-    }
-
-    public void setPricePerUnit(BigDecimal pricePerUnit) {
-        this.pricePerUnit = pricePerUnit;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public String getInvoiceImagePath() {
@@ -101,14 +82,6 @@ public class ProductItem extends BaseEntity {
         this.productImagePath = productImagePath;
     }
 
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
     public ProductCategory getCategory() {
         return category;
     }
@@ -117,19 +90,11 @@ public class ProductItem extends BaseEntity {
         this.category = category;
     }
 
-    public Set<ProductAttribute> getAttributes() {
+    public List<ProductAttribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Set<ProductAttribute> attributes) {
+    public void setAttributes(List<ProductAttribute> attributes) {
         this.attributes = attributes;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
     }
 }

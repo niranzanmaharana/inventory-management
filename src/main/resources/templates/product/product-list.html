@@ -11,9 +11,11 @@
 
     <div class="container fade-in mt-4 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary">List of Products</h2>
-            <a class="btn btn-success" th:href="@{/product/add}">
-                <i class="bi bi-plus"></i> Add New Product
+            <h2 class="text-secondary">List of Products</h2>
+            <a class="btn btn-primary" th:href="@{/product/add}"
+                th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                <i class="bi bi-plus-circle"></i> Add New Product
             </a>
         </div>
 
@@ -27,13 +29,15 @@
                         <th>Description</th>
                         <th>Category</th>
                         <th>Subcategory</th>
+                        <th>Status</th>
+                        <th>Photo</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="product: ${products}">
                         <td>
                             <div class="d-flex justify-content-between align-items-center">
-                                <div>
+                                <div class="d-flex justify-content-between align-items-center">
                                     <span th:text="${product.productName}"
                                         th:classappend="${!product.enabled} ? 'text-muted text-decoration-line-through' : ''">
                                         Product Name
@@ -43,45 +47,50 @@
                                         th:text="${product.enabled} ? 'Enabled' : 'Disabled'">
                                         Status
                                     </span>
-                                    <a href="#" class="ms-2 image-action-link text-decoration-none position-relative"
-                                        title="View/Upload Product Image" th:data-product-id="${product.id}"
-                                        th:data-image-type="PRODUCT_PHOTO"
-                                        th:data-img-url="@{${product.productImagePath}}">
-                                        <i class="bi bi-image" style="font-size: 1.5rem;"></i>
-                                    </a>
-                                    <a href="#" class="ms-2 image-action-link text-decoration-none position-relative"
-                                        title="View/Upload Invoice Image" th:data-product-id="${product.id}"
-                                        th:data-image-type="RECEIPT_PHOTO"
-                                        th:data-img-url="@{${product.invoiceImagePath}}">
-                                        <i class="bi bi-receipt" style="font-size: 1.5rem;"></i>
-                                    </a>
-                                </div>
-
-                                <div class="ms-2">
                                     <!-- Edit -->
-                                    <a th:href="@{'/product/edit/' + ${product.id}}" class="text-primary me-2"
-                                        title="Edit product" style="text-decoration: none; font-size: 0.9rem;">
+                                    <a th:href="@{'/product/edit/' + ${product.id}}" class="btn btn-sm btn-link me-2"
+                                        title="Edit product"
+                                        th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                                        th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-
-                                    <!-- Enable/Disable -->
-                                    <form th:action="@{/product/toggle-status/{id}(id=${product.id})}" method="post"
-                                        style="display:inline;">
-                                        <button type="submit" class="btn p-0 border-0"
-                                            th:classappend="${product.enabled} ? 'text-danger' : 'text-success'"
-                                            style="background: none; font-size: 1.2rem;"
-                                            th:title="${product.enabled} ? 'Disable' : 'Enable'"
-                                            th:onclick="${product.enabled} ? 'return confirm(\'Disable this product?\')' : 'return confirm(\'Enable this product?\')'}">
-                                            <i
-                                                th:classappend="${product.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </div>
                         </td>
                         <td th:text="${product.description}"></td>
                         <td th:text="${product.categoryName}"></td>
                         <td th:text="${product.subCategoryName}"></td>
+                        <td class="text-center align-middle p-0">
+                            <!-- Enable/Disable -->
+                            <form th:action="@{/product/toggle-status/{id}(id=${product.id})}" method="post"
+                                class="d-inline">
+                                <button type="submit" class="btn p-0 border-0"
+                                    th:title="${product.enabled} ? 'Disable' : 'Enable'"
+                                    onclick="return confirm(this.title + ' this product?');"
+                                    th:classappend="|${product.enabled ? 'text-success' : 'text-secondary'}${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                                    th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                    <i th:classappend="${product.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td class="text-center align-middle p-0">
+                            <a href="#"
+                                class="ms-2 image-action-link text-decoration-none position-relative btn btn-sm btn-link"
+                                title="View/Upload Product Image" th:data-product-id="${product.id}"
+                                th:data-image-type="PRODUCT_PHOTO" th:data-img-url="@{${product.productImagePath}}"
+                                th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                <i class="bi bi-image" style="font-size: 1.5rem;"></i>
+                            </a>
+                            <a href="#"
+                                class="ms-2 image-action-link text-decoration-none position-relative btn btn-sm btn-link"
+                                title="View/Upload Invoice Image" th:data-product-id="${product.id}"
+                                th:data-image-type="RECEIPT_PHOTO" th:data-img-url="@{${product.invoiceImagePath}}"
+                                th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                <i class="bi bi-receipt" style="font-size: 1.5rem;"></i>
+                            </a>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -106,7 +115,7 @@
                                 accept="image/*" required>
                         </div>
                         <div id="uploadImagePreview" class="text-center">
-                            <img src="#" class="img-thumbnail" id="previewImage" style="max-height: 200px;">
+                            <img src="#" class="img-thumbnail" id="previewImage" style="max-height: 200px;" alt="">
                         </div>
                         <div id="uploadStatusMessage" class="text-center mt-2"></div>
                     </div>
@@ -119,8 +128,6 @@
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
-
-    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
     <script th:src="@{/js/product-list.js}"></script>

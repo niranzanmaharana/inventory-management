@@ -1,13 +1,21 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_role", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "roleName", name = "UK_Role_RoleName")
+        @UniqueConstraint(columnNames = "role_name", name = "UK_ROLE_NAME")
 })
 public class UserRole extends BaseEntity {
     @Id
@@ -18,17 +26,7 @@ public class UserRole extends BaseEntity {
     private String roleName;
 
     @OneToMany(mappedBy = "userRole", cascade = CascadeType.ALL)
-    private Set<UserProfile> userProfiles = new HashSet<>();
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private List<UserProfile> userProfiles = new ArrayList<>();
 
     public String getRoleName() {
         return roleName;
@@ -38,11 +36,11 @@ public class UserRole extends BaseEntity {
         this.roleName = roleName;
     }
 
-    public Set<UserProfile> getUserProfiles() {
+    public List<UserProfile> getUserProfiles() {
         return userProfiles;
     }
 
-    public void setUserProfiles(Set<UserProfile> userProfiles) {
+    public void setUserProfiles(List<UserProfile> userProfiles) {
         this.userProfiles = userProfiles;
     }
 }

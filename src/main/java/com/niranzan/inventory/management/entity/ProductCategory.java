@@ -12,12 +12,12 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product_categories", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "categoryName", name = "UK_ProductCategory_CategoryName")
+        @UniqueConstraint(columnNames = "category_name", name = "UK_CATEGORY_NAME")
 })
 public class ProductCategory extends BaseEntity {
     @NotEmpty(message = "Category name must not be empty")
@@ -37,7 +37,7 @@ public class ProductCategory extends BaseEntity {
     private ProductCategory parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private Set<ProductCategory> subCategories = new HashSet<>();
+    private List<ProductCategory> subCategories = new ArrayList<>();
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean leaf;
@@ -66,11 +66,11 @@ public class ProductCategory extends BaseEntity {
         this.parent = parent;
     }
 
-    public Set<ProductCategory> getSubCategories() {
+    public List<ProductCategory> getSubCategories() {
         return subCategories;
     }
 
-    public void setSubCategories(Set<ProductCategory> subCategories) {
+    public void setSubCategories(List<ProductCategory> subCategories) {
         this.subCategories = subCategories;
     }
 

@@ -3,11 +3,11 @@ package com.niranzan.inventory.management.controller;
 import com.niranzan.inventory.management.dto.AttributeTypeDto;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
 import com.niranzan.inventory.management.service.AttributeTypeService;
-import com.niranzan.inventory.management.service.CategoryService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,8 +30,8 @@ import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
 public class AttributeTypeController {
     public static final String MSG_ATTRIBUTE_TYPE_STATUS_UPDATED_SUCCESSFULLY = "Attribute type {} status updated successfully.";
     private final AttributeTypeService attributeTypeService;
-    private final CategoryService categoryService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
     @GetMapping("/attribute-type-list")
     public String listAttributeTypes(Model model) {
         List<AttributeTypeDto> attributeTypes = attributeTypeService.findAllAttributes();
@@ -39,12 +39,14 @@ public class AttributeTypeController {
         return ATTRIBUTE_TYPE_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/add")
     public String addAttributeForm(Model model) {
         model.addAttribute("attributeType", new AttributeTypeDto());
         return ATTRIBUTE_TYPE_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/save")
     public String saveAttributeType(@Valid @ModelAttribute("attributeType") AttributeTypeDto attributeTypeDto, BindingResult result, Model model, RedirectAttributes attributes) {
         try {
@@ -67,6 +69,7 @@ public class AttributeTypeController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/update")
     public String updateAttributeType(@Valid @ModelAttribute("attributeType") AttributeTypeDto attributeTypeDto, BindingResult result, Model model, RedirectAttributes attributes) {
         try {
@@ -89,6 +92,7 @@ public class AttributeTypeController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/edit/{id}")
     public String editAttributeType(@PathVariable Long id, Model model) {
         AttributeTypeDto attributeType = attributeTypeService.findById(id);
@@ -96,6 +100,7 @@ public class AttributeTypeController {
         return ATTRIBUTE_TYPE_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/disable/{id}")
     public String disableAttributeType(@PathVariable Long id, RedirectAttributes attributes) {
         AttributeTypeDto dto = attributeTypeService.updateStatus(id, Boolean.FALSE);
@@ -103,6 +108,7 @@ public class AttributeTypeController {
         return REDIRECT_URL.getPath() + ATTRIBUTE_TYPE_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/enable/{id}")
     public String enableAttributeType(@PathVariable Long id, RedirectAttributes attributes) {
         AttributeTypeDto dto = attributeTypeService.updateStatus(id, Boolean.TRUE);

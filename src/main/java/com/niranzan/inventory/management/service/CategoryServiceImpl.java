@@ -4,7 +4,6 @@ import com.niranzan.inventory.management.dto.AttributeTypeDto;
 import com.niranzan.inventory.management.dto.CategoryDto;
 import com.niranzan.inventory.management.entity.ProductCategory;
 import com.niranzan.inventory.management.exceptions.ResourceNotFoundException;
-import com.niranzan.inventory.management.mapper.AttributeTypeMapper;
 import com.niranzan.inventory.management.mapper.ProductCategoryMapper;
 import com.niranzan.inventory.management.repository.CategoryRepository;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
@@ -14,12 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +23,12 @@ public class CategoryServiceImpl implements CategoryService {
     public static final String MSG_PARENT_CATEGORY_NOT_FOUND_WITH_ID = "Parent category not found with id: {}";
     private final CategoryRepository categoryRepository;
     private final ProductCategoryMapper productCategoryMapper;
-    private final AttributeTypeMapper attributeTypeMapper;
 
     @Override
-    public Set<CategoryDto> findAll() {
+    public List<CategoryDto> findAll() {
         return categoryRepository.findAll().stream()
                 .map(productCategoryMapper::toDto)
-                .collect(Collectors.toSet());
+                .toList();
     }
 
     public List<CategoryDto> getCategoryTree() {
@@ -44,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         // Convert all to DTOs and map by ID
         for (ProductCategory cat : allCategories) {
             CategoryDto dto = productCategoryMapper.toDto(cat);
-            dto.setSubCategories(new HashSet<>());
+            dto.setSubCategories(new ArrayList<>());
             dtoMap.put(dto.getId(), dto);
         }
 
@@ -66,20 +60,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Set<CategoryDto> findAllExcept(List<Long> categoryIds) {
+    public List<CategoryDto> findAllExcept(List<Long> categoryIds) {
         return categoryRepository.findAllByIdNotIn(categoryIds).stream()
-                .map(productCategoryMapper::toDto)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    public List<ProductCategory> findParentCategories() {
-        return categoryRepository.findByParentIsNull();
-    }
-
-    public List<CategoryDto> getAllTopCategoriesWithSubCategories() {
-        List<ProductCategory> topCategories = categoryRepository.findByParentIsNull();
-        return topCategories.stream()
                 .map(productCategoryMapper::toDto)
                 .toList();
     }
@@ -87,11 +69,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ProductCategory getById(Long id) {
         return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_CATEGORY_NOT_FOUND_WITH_ID, id.toString())));
-    }
-
-    @Override
-    public List<ProductCategory> getAllParentExcept(Long excludeId) {
-        return categoryRepository.findAll().stream().filter(productCategory -> Objects.isNull(productCategory.getParent())).toList();
     }
 
     @Override

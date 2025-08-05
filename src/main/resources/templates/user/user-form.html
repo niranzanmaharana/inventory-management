@@ -2,6 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments/header :: head}"></head>
+<!-- jQuery CSS -->
+<link rel="stylesheet" th:href="@{/webjars/jquery-ui/jquery-ui.min.css}" />
 
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
@@ -23,7 +25,7 @@
                     <div class="row g-3">
                         <div class="col-md-6 col-12">
                             <label for="salutation">Salutation</label>
-                            <select class="form-control" th:field="*{salutation}" required>
+                            <select class="form-select" id="salutation" th:field="*{salutation}" required>
                                 <option value="" disabled>Select</option>
                                 <option value="Mr.">Mr.</option>
                                 <option value="Mrs.">Mrs.</option>
@@ -36,7 +38,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <label for="roleName">Role</label>
-                            <select class="form-control" th:field="*{userRole.roleName}" required id="roleName">
+                            <select class="form-select" th:field="*{userRole.roleName}" required id="roleName">
                                 <option value="" disabled>Select Role</option>
                                 <option value="ROLE_ADMIN">Admin</option>
                                 <option value="ROLE_MANAGER">Manager</option>
@@ -71,7 +73,7 @@
 
                         <div class="col-md-6 col-12">
                             <label for="gender">Gender</label>
-                            <select class="form-control" th:field="*{gender}" id="gender" required>
+                            <select class="form-select" th:field="*{gender}" id="gender" required>
                                 <option value="" disabled>Select gender</option>
                                 <option value="MALE">Male</option>
                                 <option value="FEMALE">Female</option>
@@ -140,7 +142,6 @@
     <!-- Scripts -->
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
     <script>
         $(function () {

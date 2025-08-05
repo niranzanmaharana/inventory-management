@@ -7,15 +7,23 @@ import com.niranzan.inventory.management.service.SupplierService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
 
-import static com.niranzan.inventory.management.enums.AppPages.*;
+import static com.niranzan.inventory.management.enums.AppPages.REDIRECT_URL;
+import static com.niranzan.inventory.management.enums.AppPages.SUPPLIER_FORM_PATH;
+import static com.niranzan.inventory.management.enums.AppPages.SUPPLIER_LIST_PATH;
 
 @Controller
 @RequestMapping("/supplier")
@@ -23,18 +31,21 @@ import static com.niranzan.inventory.management.enums.AppPages.*;
 public class SupplierController extends BaseController {
     private final SupplierService supplierService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
     @GetMapping("/supplier-list")
     public String listSuppliers(Model model) {
         model.addAttribute("suppliers", supplierService.findAll());
         return SUPPLIER_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("supplier", new SupplierDto());
         return SUPPLIER_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         SupplierDto supplier = supplierService.getSupplierById(id);
@@ -42,6 +53,7 @@ public class SupplierController extends BaseController {
         return SUPPLIER_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/save")
     public String saveSupplier(@Valid @ModelAttribute("supplier") SupplierDto dto, BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
@@ -57,6 +69,7 @@ public class SupplierController extends BaseController {
         return REDIRECT_URL.getPath() + SUPPLIER_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/toggle-status")
     public String toggleStatus(@RequestParam long id, RedirectAttributes redirectAttributes) {
         Supplier supplier = supplierService.toggleStatus(id);

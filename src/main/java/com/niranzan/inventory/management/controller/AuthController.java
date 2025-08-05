@@ -67,6 +67,11 @@ public class AuthController extends BaseController {
         return REDIRECT_URL.getPath() + REGISTRATION_PATH.getPath();
     }
 
+    @GetMapping("/error/access-denied")
+    public String accessDenied() {
+        return "error/access-denied";
+    }
+
     private static String extractException(UserProfileDto userProfileDto, BindingResult result, Model model, DataIntegrityViolationException ex) {
         String message = ex.getMessage();
         if (message.contains("Duplicate entry")) {

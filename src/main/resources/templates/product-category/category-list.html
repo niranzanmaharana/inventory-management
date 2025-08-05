@@ -10,10 +10,12 @@
 
     <div class="container fade-in mt-4 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary">Registered Categories</h2>
+            <h2 class="text-secondary">Registered Categories</h2>
             <div class="mb-3">
-                <a class="btn btn-success" th:href="@{/product-category/add}">
-                    <i class="bi bi-plus"></i> Add Category
+                <a class="btn btn-primary" th:href="@{/product-category/add}"
+                    th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                    th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                    <i class="bi bi-plus-circle"></i> Add Category
                 </a>
             </div>
         </div>
@@ -40,42 +42,49 @@
                     <div class="d-flex align-items-center gap-2">
                         <!-- Toggle Icon -->
                         <span th:if="${category.subCategories != null and !category.subCategories.isEmpty()}"
-                            class="toggle-icon" th:text="'−'"
+                            class="toggle-expand-icon" th:text="'−'"
                             th:attr="data-target='#collapse-' + ${level} + '-' + ${iterStat.index}"
                             th:id="'toggle-' + ${level} + '-' + ${iterStat.index}">
                         </span>
 
                         <!-- Spacer if no children -->
                         <span th:if="${category.subCategories == null or category.subCategories.isEmpty()}"
-                            class="toggle-icon">&nbsp;</span>
+                            class="toggle-expand-icon">&nbsp;</span>
 
                         <!-- Category Name -->
-                        <span th:text="${category.categoryName}" th:classappend="${category.leaf} ? 'leaf' : ''"
-                            class="category-name">
+                        <span th:text="${category.categoryName}" class="category-name"
+                            th:classappend="${!category.enabled} ? 'text-muted text-decoration-line-through' : ''">
+                        </span>
+                        <span class="badge ms-2" th:classappend="${category.enabled} ? 'bg-success' : 'bg-secondary'"
+                            th:text="${category.enabled} ? 'Enabled' : 'Disabled'">
+                            Status
                         </span>
 
                         <!-- Enable/Disable -->
                         <form th:action="@{/product-category/toggle-status/{id}(id=${category.id})}" method="post"
-                            style="display:inline;">
+                            class="d-inline">
                             <button type="submit" class="btn p-0 border-0"
-                                th:classappend="${category.enabled} ? 'text-danger' : 'text-success'"
-                                style="background: none; font-size: 1.2rem;"
+                                onclick="return confirm(this.title + ' this category?');"
                                 th:title="${category.enabled} ? 'Disable' : 'Enable'"
-                                th:onclick="${category.enabled} ? 'return confirm(\'Disable this category?\')' : 'return confirm(\'Enable this category?\')'}">
-                                <i th:classappend="${category.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+                                th:classappend="|${category.enabled ? 'text-success' : 'text-secondary'}${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                <i th:classappend="${category.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"
+                                    style="font-size: 1.4rem;"></i>
                             </button>
                         </form>
 
                         <!-- Add a sub category to it -->
-                        <a th:href="@{/product-category/add(parentId=${category.id})}"
-                            class="text-success ms-2" title="Add a subcategory to it"
-                            style="font-size: 0.95rem; text-decoration: none;">
+                        <a th:href="@{/product-category/add(parentId=${category.id})}" class="btn btn-sm btn-link"
+                            title="Add a subcategory to it"
+                            th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                            th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
                             <i class="bi bi-plus-circle"></i>
                         </a>
 
                         <!-- Edit -->
-                        <a th:href="@{'/product-category/edit/' + ${category.id}}" class="text-primary me-2"
-                            title="Edit Category" style="text-decoration: none; font-size: 0.9rem;">
+                        <a th:href="@{'/product-category/edit/' + ${category.id}}" class="btn btn-sm btn-link"
+                            th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                            th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </div>
@@ -93,7 +102,6 @@
 
     <!-- Scripts -->
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/category.js}"></script>
 </body>
 

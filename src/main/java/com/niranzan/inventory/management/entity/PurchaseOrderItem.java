@@ -1,6 +1,13 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.*;
+import com.niranzan.inventory.management.enums.AppConstants;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +17,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "purchase_order_item")
-public class PurchaseItem extends BaseEntity {
+@Table(name = "purchase_order_item", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "batch_code", name = "UK_BATCH_CODE")
+})
+public class PurchaseOrderItem extends BaseEntity {
     @ManyToOne(optional = false)
     @JoinColumn(
             name = "purchase_order_id",
@@ -28,6 +37,9 @@ public class PurchaseItem extends BaseEntity {
     )
     private ProductItem productItem;
 
+    @Column(name = "batch_code", unique = true, length = 50)
+    private String batchCode;
+
     @Column(nullable = false)
     private Integer quantity;
 
@@ -38,5 +50,8 @@ public class PurchaseItem extends BaseEntity {
     private BigDecimal subTotal;
 
     @Column(nullable = false)
-    private LocalDate expiryDate;
+    private LocalDate expiryDate = LocalDate.parse(AppConstants.DEFAULT_EXPIRY_DATE.getValue());
+
+    @Column(name = "received", nullable = false)
+    private Boolean received = false;
 }

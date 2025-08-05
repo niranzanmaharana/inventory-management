@@ -8,7 +8,6 @@ import com.niranzan.inventory.management.entity.AttributeType;
 import com.niranzan.inventory.management.entity.ProductAttribute;
 import com.niranzan.inventory.management.entity.ProductCategory;
 import com.niranzan.inventory.management.entity.ProductItem;
-import com.niranzan.inventory.management.entity.Supplier;
 import com.niranzan.inventory.management.enums.ImageFileType;
 import com.niranzan.inventory.management.exceptions.GenericException;
 import com.niranzan.inventory.management.exceptions.InvalidFormDataException;
@@ -18,7 +17,6 @@ import com.niranzan.inventory.management.mapper.ProductMapper;
 import com.niranzan.inventory.management.repository.AttributeTypeRepository;
 import com.niranzan.inventory.management.repository.CategoryRepository;
 import com.niranzan.inventory.management.repository.ProductRepository;
-import com.niranzan.inventory.management.repository.SupplierRepository;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import com.niranzan.inventory.management.view.response.ProductResponse;
 import jakarta.transaction.Transactional;
@@ -40,14 +38,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.niranzan.inventory.management.config.AppMessage.MSG_CATEGORY_NOT_FOUND_WITH_ID;
 import static com.niranzan.inventory.management.config.AppMessage.MSG_INVALID_ATTRIBUTES_EXCEPTION;
 import static com.niranzan.inventory.management.config.AppMessage.MSG_PRODUCT_NOT_FOUND_WITH_ID;
-import static com.niranzan.inventory.management.config.AppMessage.MSG_SUPPLIER_NOT_FOUND_WITH_ID;
 import static com.niranzan.inventory.management.config.AppMessage.MSG_UNKNOWN_EXCEPTION;
 
 @Service
@@ -56,7 +52,6 @@ import static com.niranzan.inventory.management.config.AppMessage.MSG_UNKNOWN_EX
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final SupplierRepository supplierRepository;
     private final ProductMapper productMapper;
     private final AttributeTypeRepository attributeTypeRepository;
     private final ObjectMapper objectMapper;
@@ -77,8 +72,6 @@ public class ProductService {
             response.setId(product.getId());
             response.setProductName(product.getProductName());
             response.setDescription(product.getDescription());
-            response.setAvailableQty(product.getQuantity());
-            response.setPrice(product.getPricePerUnit());
             response.setInvoiceImagePath(product.getInvoiceImagePath());
             response.setProductImagePath(product.getProductImagePath());
             response.setEnabled(product.isEnabled());
@@ -99,8 +92,6 @@ public class ProductService {
         ProductItem product = Objects.isNull(productDto.getId()) ? new ProductItem()
                 : productRepository.findById(productDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_PRODUCT_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productDto.getId()))));
-        Supplier supplier = supplierRepository.findById(productDto.getSupplierId())
-                .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_SUPPLIER_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productDto.getSupplierId()))));
         ProductCategory subCategory = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_CATEGORY_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(productDto.getCategoryId()))));
 
@@ -110,11 +101,10 @@ public class ProductService {
             productDto.setProductAttributes(productAttributes);
             product.setProductName(productDto.getProductName());
             product.setDescription(productDto.getDescription());
-            product.setQuantity(productDto.getQuantity());
-            product.setPricePerUnit(productDto.getPricePerUnit());
-            product.setExpiryDate(productDto.getExpiryDate());
-            product.setSupplier(supplier);
             product.setCategory(subCategory);
+            if (Objects.isNull(product.getProductCode())) {
+                product.setProductCode(generateProductCode(product.getProductName()));
+            }
             setupProductAttributes(productDto, product);
             ProductItem savedProduct = productRepository.save(product);
 
@@ -185,7 +175,7 @@ public class ProductService {
         }
 
         // Get existing attributes (same instance)
-        Set<ProductAttribute> existingAttributes = product.getAttributes();
+        List<ProductAttribute> existingAttributes = product.getAttributes();
         existingAttributes.clear();
 
         for (Map.Entry<Long, String> entry : productDto.getProductAttributes().entrySet()) {
@@ -286,5 +276,20 @@ public class ProductService {
             }
         }
         return "A data integrity violation occurred.: " + ex.getMessage();
+    }
+
+    public String generateProductCode(String productName) {
+        String cleanedProductName = productName != null
+                ? productName.replaceAll("\\s+", "").toUpperCase()
+                : "PROD";
+
+        String prefix = cleanedProductName.length() >= 4
+                ? cleanedProductName.substring(0, 4)
+                : cleanedProductName;
+
+        Long maxId = productRepository.findMaxId();
+        long nextId = (maxId != null ? maxId + 1 : 1);
+
+        return String.format("%s-%04d", prefix, nextId);
     }
 }

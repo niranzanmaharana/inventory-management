@@ -6,7 +6,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "attribute_type", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "attributeName", name = "UK_AttributeType_AttributeName")
+        @UniqueConstraint(columnNames = "attribute_name", name = "UK_ATTRIBUTE_NAME")
 })
 public class AttributeType extends BaseEntity {
 

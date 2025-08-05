@@ -24,7 +24,7 @@
                     <div class="row">
                         <div class="col-md-6 col-12">
                             <label for="salutation">Salutation</label>
-                            <select class="form-control" th:field="*{salutation}" required>
+                            <select class="form-select" id="salutation" th:field="*{salutation}" required>
                                 <option value="" disabled>Select</option>
                                 <option value="Mr.">Mr.</option>
                                 <option value="Mrs.">Mrs.</option>
@@ -55,7 +55,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label for="gender" class="form-label">Gender</label>
-                            <select class="form-control" th:field="*{gender}" id="gender" required>
+                            <select class="form-select" th:field="*{gender}" id="gender" required>
                                 <option value="" disabled selected>Select gender</option>
                                 <option value="MALE">Male</option>
                                 <option value="FEMALE">Female</option>

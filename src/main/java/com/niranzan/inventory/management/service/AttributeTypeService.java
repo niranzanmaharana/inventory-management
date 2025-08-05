@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +33,7 @@ public class AttributeTypeService {
         AttributeType attributeType = attributeTypeRepository.findById(attributeTypeDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(MessageFormatUtil.format(MSG_ATTRIBUTE_TYPE_NOT_FOUND_WITH_ID, attributeTypeDto.getId().toString())));
         attributeType.setAttributeName(attributeTypeDto.getAttributeName());
+        attributeType.setDataType(attributeTypeDto.getDataType());
         AttributeType savedAttributeType = attributeTypeRepository.save(attributeType);
         return convert(savedAttributeType);
     }
@@ -57,10 +57,11 @@ public class AttributeTypeService {
     }
 
     private AttributeType convert(AttributeTypeDto attributeTypeDto) {
-        AttributeType dto = new AttributeType();
-        dto.setId(attributeTypeDto.getId());
-        dto.setAttributeName(attributeTypeDto.getAttributeName());
-        return dto;
+        AttributeType attributeType = new AttributeType();
+        attributeType.setId(attributeTypeDto.getId());
+        attributeType.setAttributeName(attributeTypeDto.getAttributeName());
+        attributeType.setDataType(attributeTypeDto.getDataType());
+        return attributeType;
     }
 
     private AttributeTypeDto convert(AttributeType attr) {
@@ -70,9 +71,5 @@ public class AttributeTypeService {
         dto.setEnabled(attr.isEnabled());
         dto.setDataType(attr.getDataType());
         return dto;
-    }
-
-    public Set<AttributeType> findAllByIds(Set<Long> attributeTypeIds) {
-        return attributeTypeRepository.findByIdIn(attributeTypeIds);
     }
 }

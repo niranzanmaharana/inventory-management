@@ -3,8 +3,8 @@ package com.niranzan.inventory.management.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CategoryDto {
     private Long id;
@@ -17,7 +17,7 @@ public class CategoryDto {
     private boolean enabled;
     private Long parentId;
     private boolean leaf;
-    private Set<CategoryDto> subCategories = new HashSet<>();
+    private List<CategoryDto> subCategories = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -59,11 +59,11 @@ public class CategoryDto {
         this.parentId = parentId;
     }
 
-    public Set<CategoryDto> getSubCategories() {
+    public List<CategoryDto> getSubCategories() {
         return subCategories;
     }
 
-    public void setSubCategories(Set<CategoryDto> subCategories) {
+    public void setSubCategories(List<CategoryDto> subCategories) {
         this.subCategories = subCategories;
     }
 

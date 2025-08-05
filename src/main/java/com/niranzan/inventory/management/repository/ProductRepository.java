@@ -12,4 +12,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductItem, Long> {
     @Query("SELECT p FROM ProductItem p WHERE p.category.id = :categoryId")
     List<ProductItem> findByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Query("SELECT MAX(p.id) FROM ProductItem p")
+    Long findMaxId();
 }

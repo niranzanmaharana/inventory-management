@@ -9,9 +9,11 @@
 
     <div class="container fade-in mt-4 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary">List of Registered Users</h2>
-            <a class="btn btn-success" th:href="@{/user/add}">
-                <i class="bi bi-person-plus-fill"></i> Add New User
+            <h2 class="text-secondary">List of Registered Users</h2>
+            <a class="btn btn-primary" th:href="@{/user/add}"
+                th:classappend="${not #authorization.expression('hasRole(''ROLE_ADMIN'')') ? ' disabled' : ''}|"
+                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <i class="bi bi-plus-circle"></i> Add New User
             </a>
         </div>
 
@@ -21,37 +23,45 @@
             <table class="table table-bordered table-hover shadow-sm mt-3">
                 <thead class="table-primary">
                     <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
+                        <th>Name</th>
                         <th>Username</th>
                         <th>Role</th>
                         <th>Status</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="userProfile : ${userProfiles}">
-                        <td th:text="${userProfile.firstName}"></td>
-                        <td th:text="${userProfile.lastName}"></td>
+                        <td>
+                            <span th:text="${userProfile.firstName} + ' ' + ${userProfile.lastName}" class="user-name"
+                                th:classappend="${!userProfile.enabled} ? 'text-muted text-decoration-line-through' : ''">
+                            </span>
+                            <span class="badge ms-2"
+                                th:classappend="${userProfile.enabled} ? 'bg-success' : 'bg-secondary'"
+                                th:text="${userProfile.enabled} ? 'Enabled' : 'Disabled'">
+                                Status
+                            </span>
+                            <a class="btn btn-sm btn-link" th:href="@{'/user/edit/' + ${userProfile.id}}"
+                                th:classappend="${not #authorization.expression('hasRole(''ROLE_ADMIN'')') ? ' disabled' : ''}|"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
                         <td th:text="${userProfile.username}"></td>
                         <td th:text="${userProfile.userRole.roleName}"></td>
                         <td class="text-center align-middle p-0">
-                            <form th:action="@{/user/toggle-status}" method="post" th:object="${userProfile}" class="d-inline">
+                            <form th:action="@{/user/toggle-status}" method="post" th:object="${userProfile}"
+                                class="d-inline">
                                 <input type="hidden" th:name="id" th:value="${userProfile.id}" />
                                 <button type="submit" class="btn btn-link p-0 border-0"
-                                    th:classappend="${userProfile.enabled} ? 'text-success' : 'text-secondary'"
                                     th:title="${userProfile.enabled} ? 'Disable' : 'Enable'"
-                                    style="line-height: 1; vertical-align: middle;"
-                                    onclick="return confirm(this.title + ' this userProfile?');">
-                                    <i class="bi" th:classappend="${userProfile.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"
+                                    onclick="return confirm(this.title + ' this userProfile?');"
+                                    th:classappend="|${userProfile.enabled ? 'text-success' : 'text-secondary'}${not #authorization.expression('hasRole(''ROLE_ADMIN'')') ? ' disabled' : ''}|"
+                                    th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                                    <i class="bi"
+                                        th:classappend="${userProfile.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"
                                         style="font-size: 1.4rem;"></i>
                                 </button>
                             </form>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-sm btn-primary" th:href="@{'/user/edit/' + ${userProfile.id}}">
-                                <i class="bi bi-eye"></i> View
-                            </a>
                         </td>
                     </tr>
                 </tbody>
@@ -60,8 +70,6 @@
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
-
-    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 </body>
 
 </html>

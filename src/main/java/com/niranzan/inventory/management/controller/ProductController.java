@@ -8,7 +8,6 @@ import com.niranzan.inventory.management.enums.ImageFileType;
 import com.niranzan.inventory.management.service.AttributeTypeService;
 import com.niranzan.inventory.management.service.CategoryService;
 import com.niranzan.inventory.management.service.ProductService;
-import com.niranzan.inventory.management.service.SupplierService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import com.niranzan.inventory.management.view.response.ProductResponse;
 import jakarta.validation.Valid;
@@ -17,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,11 +49,11 @@ public class ProductController extends BaseController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final AttributeTypeService attributeTypeService;
-    private final SupplierService supplierService;
     private final ObjectMapper objectMapper;
     @Value("${default.image-path}")
     private String defaultImagePath;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
     @GetMapping("/product-list")
     public String listProducts(Model model) {
         List<ProductResponse> products = productService.findAll();
@@ -62,6 +62,7 @@ public class ProductController extends BaseController {
         return PRODUCT_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
     @GetMapping("/by-category/{categoryId}")
     @ResponseBody
     public ResponseEntity<List<ProductDto>> findByCategory(@PathVariable Long categoryId) {
@@ -70,6 +71,7 @@ public class ProductController extends BaseController {
         return ResponseEntity.ok(products);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/add")
     public String addProductForm(Model model) {
         ProductDto productDto = new ProductDto();
@@ -79,6 +81,7 @@ public class ProductController extends BaseController {
         return PRODUCT_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/save")
     public String saveProduct(@Valid @ModelAttribute("product") ProductDto productDto,
                               BindingResult result,
@@ -106,6 +109,7 @@ public class ProductController extends BaseController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/edit/{productId}")
     public String editProductForm(@PathVariable Long productId, Model model) {
         log.info("Received request to open edit product form with id: {}", productId);
@@ -115,6 +119,7 @@ public class ProductController extends BaseController {
         return PRODUCT_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/upload-image")
     @ResponseBody
     public ResponseEntity<String> uploadProductImage(
@@ -125,6 +130,7 @@ public class ProductController extends BaseController {
         return ResponseEntity.ok(productService.uploadImage(productId, imageType, file));
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/image-path")
     @ResponseBody
     public String getImagePath(@RequestParam Long id, @RequestParam String imageType) {
@@ -146,6 +152,7 @@ public class ProductController extends BaseController {
         return StringUtils.defaultString(imagePath);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/toggle-status/{id}")
     public String toggleStatus(@PathVariable Long id, RedirectAttributes attributes) {
         log.info("Received request to toggle the status of product with id: {}", id);
@@ -164,7 +171,6 @@ public class ProductController extends BaseController {
     private void addModelAttributes(Model model, ProductDto productDto) {
         model.addAttribute("product", productDto);
         model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("suppliers", supplierService.findAll());
         model.addAttribute("attributeTypes", attributeTypeService.findAllAttributes());
         model.addAttribute("productAttributes", convertAttributes(productDto.getProductAttributes()));
     }

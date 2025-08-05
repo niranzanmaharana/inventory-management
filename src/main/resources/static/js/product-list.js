@@ -45,27 +45,32 @@ $(document).ready(function () {
             .removeClass('d-none');
     }
 
+    function sendAjaxAction(action, orderId) {
+        if (!confirm(`Are you sure you want to ${action} this order?`)) return;
+
+        $.ajax({
+            url: `/purchase-order/${action}/${orderId}`,
+            type: 'POST',
+            success: function () {
+                alert(`Order ${action}d successfully`);
+                location.reload(); // Or use AJAX to update just the affected row
+            },
+            error: function (xhr) {
+                const message = xhr.responseJSON?.message || `Failed to ${action} order`;
+                alert(message);
+            }
+        });
+    }
+
     $('.image-action-link').on('click', function (e) {
         $('#uploadStatusMessage').addClass('d-none').text('');
         e.preventDefault();
-
-        // debugger;
         const productId = $(this).data('product-id');
         const imageType = $(this).data('image-type');
         $('#uploadProductId').val(productId);
         $('#uploadImageType').val(imageType);
         $('#productImage').val('');
         $('#previewImage').addClass('d-none').attr('src', '#');
-
-        // $.get(`/product/image-path/${productId}`, function (imagePath) {
-        //     if (imagePath) {
-        //         $('#previewImage').attr('src', imagePath).removeClass('d-none');
-        //     }
-        //     $('#uploadImageModal').modal('show');
-        // }).fail(function () {
-        //     showStatusMessage("Could not load product image.", "error");
-        //     $('#uploadImageModal').modal('show');
-        // });
         retrieveImage(productId, imageType);
     });
 

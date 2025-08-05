@@ -5,24 +5,17 @@ import com.niranzan.inventory.management.dto.CategoryDto;
 import com.niranzan.inventory.management.entity.ProductCategory;
 
 import java.util.List;
-import java.util.Set;
 
 public interface CategoryService {
-    Set<CategoryDto> findAll();
+    List<CategoryDto> findAll();
 
     ProductCategory update(Long id, CategoryDto categoryDto);
 
     ProductCategory saveCategory(CategoryDto category);
 
-    Set<CategoryDto> findAllExcept(List<Long> categoryIds);
-
-    List<ProductCategory> findParentCategories();
-
-    List<CategoryDto> getAllTopCategoriesWithSubCategories();
+    List<CategoryDto> findAllExcept(List<Long> categoryIds);
 
     ProductCategory getById(Long id);
-
-    List<ProductCategory> getAllParentExcept(Long id);
 
     ProductCategory save(ProductCategory category);
 

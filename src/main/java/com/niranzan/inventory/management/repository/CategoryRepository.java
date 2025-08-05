@@ -10,11 +10,7 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<ProductCategory, Long> {
-    List<ProductCategory> findByParentIsNull();          // Top-level
-
-    List<ProductCategory> findByParentId(Long parentId); // Subcategories
-
-    List<ProductCategory> findByIdNot(Long excludeId);
+    List<ProductCategory> findByParentIsNull();
 
     @Query("SELECT c FROM ProductCategory c WHERE c.parent.id = :categoryId")
     List<ProductCategory> findByParent(@Param("categoryId") Long categoryId);

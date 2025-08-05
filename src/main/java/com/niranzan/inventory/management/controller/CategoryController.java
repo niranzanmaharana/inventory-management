@@ -6,12 +6,12 @@ import com.niranzan.inventory.management.entity.ProductCategory;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
 import com.niranzan.inventory.management.exceptions.ResourceNotFoundException;
 import com.niranzan.inventory.management.mapper.ProductCategoryMapper;
-import com.niranzan.inventory.management.service.AttributeTypeService;
 import com.niranzan.inventory.management.service.CategoryService;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static com.niranzan.inventory.management.enums.AppPages.PRODUCT_CATEGORY_FORM_PATH;
 import static com.niranzan.inventory.management.enums.AppPages.PRODUCT_CATEGORY_LIST_PATH;
@@ -39,11 +37,10 @@ public class CategoryController extends BaseController {
     public static final String MODEL_ATTR_PLACEHOLDER_FOR_CATEGORY = "category";
     public static final String MODEL_ATTR_PLACEHOLDER_FOR_CATEGORIES = "categories";
     public static final String MODEL_ATTR_PLACEHOLDER_FOR_HAS_SUB_CATEGORIES = "hasSubCategories";
-    public static final String MODEL_ATTR_PLACEHOLDER_HOR_ATTRIBUTE_TYPE = "attributeTypes";
     private final CategoryService categoryService;
     private final ProductCategoryMapper productCategoryMapper;
-    private final AttributeTypeService attributeTypeService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
     @GetMapping("/category-list")
     public String listCategories(Model model) {
         List<CategoryDto> categoryTree = categoryService.getCategoryTree();
@@ -51,6 +48,7 @@ public class CategoryController extends BaseController {
         return PRODUCT_CATEGORY_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/add")
     public String showAddForm(Model model, @RequestParam(name = "parentId", required = false) Long parentId) {
         CategoryDto categoryDto = new CategoryDto();
@@ -61,6 +59,7 @@ public class CategoryController extends BaseController {
         return PRODUCT_CATEGORY_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/save")
     public String saveCategory(@Valid @ModelAttribute("category") CategoryDto categoryDto, BindingResult result, Model model, RedirectAttributes attributes) {
         try {
@@ -83,6 +82,7 @@ public class CategoryController extends BaseController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/edit/{id}")
     public String editCategoryForm(@PathVariable Long id, Model model) {
         ProductCategory category = categoryService.getById(id);
@@ -92,6 +92,7 @@ public class CategoryController extends BaseController {
         return PRODUCT_CATEGORY_FORM_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/update/{id}")
     public String updateCategory(@PathVariable Long id,
                                  @Valid @ModelAttribute CategoryDto categoryDto,
@@ -108,6 +109,7 @@ public class CategoryController extends BaseController {
         return REDIRECT_URL.getPath() + PRODUCT_CATEGORY_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/toggle-status/{id}")
     public String toggleStatus(@PathVariable Long id, RedirectAttributes attributes) {
         try {
@@ -119,12 +121,14 @@ public class CategoryController extends BaseController {
         return REDIRECT_URL.getPath() + PRODUCT_CATEGORY_LIST_PATH.getPath();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/{categoryId}/subcategories")
     @ResponseBody
     public List<CategoryDto> findSubCategories(@PathVariable Long categoryId) {
         return categoryService.findSubCategories(categoryId);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER'")
     @GetMapping("/attributes/{subCategoryId}")
     @ResponseBody
     public List<AttributeTypeDto> getAttributesForSubCategory(@PathVariable Long subCategoryId) {
@@ -133,7 +137,7 @@ public class CategoryController extends BaseController {
 
     private void addModelAttributes(boolean hasSubcategories, CategoryDto categoryDto, Model model) {
         Long currentCategoryId = categoryDto.getId();
-        Set<CategoryDto> categories = (currentCategoryId != null)
+        List<CategoryDto> categories = (currentCategoryId != null)
                 ? categoryService.findAllExcept(List.of(currentCategoryId))
                 : categoryService.findAll();
 

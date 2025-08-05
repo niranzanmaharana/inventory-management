@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<link rel="stylesheet" th:href="@{/css/category.css}">
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-secondary">Registered Categories</h2>
+            <div class="mb-3">
+                <a class="btn btn-primary" th:href="@{/product-category/add}"
+                    th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                    th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                    <i class="bi bi-plus-circle"></i> Add Category
+                </a>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <!-- Category Tree -->
+        <div class="container mt-4">
+            <div>
+                <button id="expandAllBtn" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="bi bi-plus-square"></i> Expand All
+                </button>
+                <button id="collapseAllBtn" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-dash-square"></i> Collapse All
+                </button>
+            </div>
+            <div th:replace="~{::categoryTreeFragment(${categoryTree}, 0)}"></div>
+        </div>
+
+        <!-- Recursive Fragment -->
+        <th:block th:fragment="categoryTreeFragment(categoryList, level)">
+            <ul class="category-tree">
+                <li th:each="category, iterStat : ${categoryList}">
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Toggle Icon -->
+                        <span th:if="${category.subCategories != null and !category.subCategories.isEmpty()}"
+                            class="toggle-expand-icon" th:text="'−'"
+                            th:attr="data-target='#collapse-' + ${level} + '-' + ${iterStat.index}"
+                            th:id="'toggle-' + ${level} + '-' + ${iterStat.index}">
+                        </span>
+
+                        <!-- Spacer if no children -->
+                        <span th:if="${category.subCategories == null or category.subCategories.isEmpty()}"
+                            class="toggle-expand-icon">&nbsp;</span>
+
+                        <!-- Category Name -->
+                        <span th:text="${category.categoryName}" class="category-name"
+                            th:classappend="${!category.enabled} ? 'text-muted text-decoration-line-through' : ''">
+                        </span>
+                        <span class="badge ms-2" th:classappend="${category.enabled} ? 'bg-success' : 'bg-secondary'"
+                            th:text="${category.enabled} ? 'Enabled' : 'Disabled'">
+                            Status
+                        </span>
+
+                        <!-- Enable/Disable -->
+                        <form th:action="@{/product-category/toggle-status/{id}(id=${category.id})}" method="post"
+                            class="d-inline">
+                            <button type="submit" class="btn p-0 border-0"
+                                onclick="return confirm(this.title + ' this category?');"
+                                th:title="${category.enabled} ? 'Disable' : 'Enable'"
+                                th:classappend="|${category.enabled ? 'text-success' : 'text-secondary'}${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                <i th:classappend="${category.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"
+                                    style="font-size: 1.4rem;"></i>
+                            </button>
+                        </form>
+
+                        <!-- Add a sub category to it -->
+                        <a th:href="@{/product-category/add(parentId=${category.id})}" class="btn btn-sm btn-link"
+                            title="Add a subcategory to it"
+                            th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                            th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+
+                        <!-- Edit -->
+                        <a th:href="@{'/product-category/edit/' + ${category.id}}" class="btn btn-sm btn-link"
+                            th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                            th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+
+                    <!-- Subcategories -->
+                    <div class="collapse show ms-4" th:id="'collapse-' + ${level} + '-' + ${iterStat.index}">
+                        <div th:replace="~{::categoryTreeFragment(${category.subCategories}, ${level + 1})}"></div>
+                    </div>
+                </li>
+            </ul>
+        </th:block>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/js/category.js}"></script>
+</body>
+
+</html>

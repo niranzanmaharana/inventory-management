@@ -1,57 +1,54 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
->
-<head>
-    <meta charset="UTF-8">
-    <title>Registration and Login System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-          crossorigin="anonymous">
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/index}">Registration and Login System</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <!--                    <a class="nav-link active" aria-current="page" th:href="@{/logout}">Logout</a>-->
-                    <form th:action="@{/logout}" method="post">
-                        <button class="btn btn-link nav-link" type="submit"
-                                style="color: white; text-decoration: none;">Logout
-                        </button>
-                    </form>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-primary">Welcome to User Home</h2>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <!-- Personalized welcome message.html -->
+        <div class="mb-4">
+            <h5>Hello <span th:text="${userProfile.salutation}">Salutation</span> <span th:text="${userProfile.firstName}">First name</span></h5>
+            <p>We’re glad to have you in the <strong>Inventory Management System</strong>. Here, you can manage
+                products, monitor stock, and streamline purchasing — all in one place.</p>
+        </div>
+
+        <!-- Features section -->
+        <div class="card shadow-sm p-4">
+            <h4 class="text-success mb-3">Key Features</h4>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <i class="bi bi-box"></i> <strong>Product Management:</strong> Add, edit, and track items across
+                    categories.
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-diagram-3"></i> <strong>Purchase Orders:</strong> Manage supplier orders
+                    efficiently.
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-shield-check"></i> <strong>Role-Based Access:</strong> Users have different
+                    permissions based on userRoles (Staff, Manager, Admin).
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-graph-up-arrow"></i> <strong>Stock Tracking:</strong> Monitor current stock levels
+                    and restock when needed.
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-lock"></i> <strong>Security:</strong> Enforced login, password encryption, and
+                    restricted access to critical features.
                 </li>
             </ul>
         </div>
     </div>
-</nav>
-<div class="container">
-    <div class="row col-md-10">
-        <h2>List of Registered Users</h2>
-    </div>
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="user : ${users}">
-            <td th:text="${user.firstName}"></td>
-            <td th:text="${user.lastName}"></td>
-            <td th:text="${user.email}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
+
 </html>

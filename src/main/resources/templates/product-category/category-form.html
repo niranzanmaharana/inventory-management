@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-5 fade-in">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-sm p-4">
+                    <h4 class="text-center mb-3 text-primary"
+                        th:text="${category.id != null} ? 'Edit Category' : 'Add New Category'">
+                        Category Form
+                    </h4>
+
+                    <div th:replace="~{fragments/message :: message}"></div>
+
+                    <form
+                        th:action="@{${category.id != null} ? '/product-category/update/' + ${category.id} : '/product-category/save'}"
+                        th:object="${category}" method="post" class="needs-validation" novalidate>
+
+                        <!-- Category Name -->
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" th:field="*{categoryName}" id="categoryName"
+                                placeholder="Enter category name" required />
+                            <div class="text-danger" th:if="${#fields.hasErrors('categoryName')}"
+                                th:errors="*{categoryName}"></div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" th:field="*{description}" id="description" rows="3"
+                                placeholder="Optional description"></textarea>
+                            <div class="text-danger" th:if="${#fields.hasErrors('description')}"
+                                th:errors="*{description}"></div>
+                        </div>
+
+                        <!-- Parent Category -->
+                        <div class="mb-3">
+                            <label for="parentId" class="form-label">Parent Category</label>
+                            <select class="form-select" th:field="*{parentId}" id="parentId"
+                                th:disabled="${category.parentId == null and hasSubCategories}">
+                                <option value="">-- None --</option>
+                                <option th:each="parent : ${categories}" th:value="${parent.id}"
+                                    th:selected="${parent.id} == ${category.parentId}"
+                                    th:text="${parent.categoryName + (parent.leaf ? ' 🌿' : '')}">
+                                </option>
+                            </select>
+                            <div th:if="${category.parentId == null and hasSubCategories}"
+                                class="form-text text-danger">
+                                This category has subcategories and cannot be assigned a new parent.
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i>
+                                <span th:text="${category.id != null} ? 'Update' : 'Save'">Save</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 text-center">
+                        <a th:href="@{/product-category/category-list}" class="btn btn-link">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+</body>
+
+</html>

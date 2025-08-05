@@ -1,0 +1,75 @@
+<!-- templates/user/home.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-secondary">List of Registered Users</h2>
+            <a class="btn btn-primary" th:href="@{/user/add}"
+                th:classappend="${not #authorization.expression('hasRole(''ROLE_ADMIN'')') ? ' disabled' : ''}|"
+                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <i class="bi bi-plus-circle"></i> Add New User
+            </a>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover shadow-sm mt-3">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="userProfile : ${userProfiles}">
+                        <td>
+                            <span th:text="${userProfile.firstName} + ' ' + ${userProfile.lastName}" class="user-name"
+                                th:classappend="${!userProfile.enabled} ? 'text-muted text-decoration-line-through' : ''">
+                            </span>
+                            <span class="badge ms-2"
+                                th:classappend="${userProfile.enabled} ? 'bg-success' : 'bg-secondary'"
+                                th:text="${userProfile.enabled} ? 'Enabled' : 'Disabled'">
+                                Status
+                            </span>
+                            <a class="btn btn-sm btn-link" th:href="@{'/user/edit/' + ${userProfile.id}}"
+                                th:classappend="${not #authorization.expression('hasRole(''ROLE_ADMIN'')') ? ' disabled' : ''}|"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                        <td th:text="${userProfile.username}"></td>
+                        <td th:text="${userProfile.userRole.roleName}"></td>
+                        <td class="text-center align-middle p-0">
+                            <form th:action="@{/user/toggle-status}" method="post" th:object="${userProfile}"
+                                class="d-inline">
+                                <input type="hidden" th:name="id" th:value="${userProfile.id}" />
+                                <button type="submit" class="btn btn-link p-0 border-0"
+                                    th:title="${userProfile.enabled} ? 'Disable' : 'Enable'"
+                                    onclick="return confirm(this.title + ' this userProfile?');"
+                                    th:classappend="|${userProfile.enabled ? 'text-success' : 'text-secondary'}${not #authorization.expression('hasRole(''ROLE_ADMIN'')') ? ' disabled' : ''}|"
+                                    th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                                    <i class="bi"
+                                        th:classappend="${userProfile.enabled} ? 'bi-toggle-on' : 'bi-toggle-off'"
+                                        style="font-size: 1.4rem;"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

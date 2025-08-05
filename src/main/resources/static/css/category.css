@@ -1,0 +1,15 @@
+.category-name {
+    display: inline-block;
+    font-size: 1rem;
+}
+
+.leaf {
+    color: green;
+    font-weight: 500;
+}
+
+.btn-action {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    margin-left: 5px;
+}

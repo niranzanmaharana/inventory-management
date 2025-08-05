@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-5 fade-in">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-secondary">Attribute Types</h2>
+            <a class="btn btn-primary" th:href="@{/attribute-type/add}"
+                th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                <i class="bi bi-plus-circle"></i> Add Attribute Type
+            </a>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Attribute Name</th>
+                        <th>Data Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="attr : ${attributeTypes}">
+                        <td>
+                            <span th:text="${attr.attributeName}"></span>
+                            <a th:href="@{'/attribute-type/edit/' + ${attr.id}}" class="btn btn-sm btn-link me-2"
+                                th:classappend="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')} ? ' disabled'"
+                                th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                        <td th:text="${attr.dataType}"></td>
+                        <td>
+                            <form
+                                th:action="@{${attr.enabled} ? '/attribute-type/disable/' + ${attr.id} : '/attribute-type/enable/' + ${attr.id}}"
+                                method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-link btn p-0 border-0"
+                                    onclick="return confirm(this.title + ' this attribute?');"
+                                    style="line-height: 1; vertical-align: middle;"
+                                    th:title="${attr.enabled} ? 'Disable' : 'Enable'"
+                                    th:classappend="|${attr.enabled ? 'text-success' : 'text-secondary'}${not #authorization.expression('hasRole(''ROLE_MANAGER'')') ? ' disabled' : ''}|"
+                                    th:disabled="${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}"
+                                    th:attr="aria-disabled=${not #authorization.expression('hasRole(''ROLE_MANAGER'')')}">
+                                    <i th:classappend="${attr.enabled} ? 'bi-toggle-off' : 'bi-toggle-on'"
+                                        style="font-size: 1.4rem;"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(attributeTypes)}">
+                        <td colspan="3" class="text-center text-muted py-3">No attribute types found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

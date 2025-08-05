@@ -6,22 +6,46 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/inventory-management?useSSL=false&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     username: root
     password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
   #jpa properties
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      dialect: org.hibernate.dialect.MySQL8Dialect
-      format_sql: true
+      format_sql: false
       ddl-auto: update
-    show-sql: false
+    show-sql: true
 
-#mvc properties
-  mvc:
-    throw-exception-if-no-handler-found: true
+  #file retrieval properties
   web:
     resources:
-      add-mappings: false
+      static-locations: classpath:/static/,file:uploads/
+
+  #multipart file properties
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  #mvc properties
+  mvc:
+    throw-exception-if-no-handler-found: true
+#  web:
+#    resources:
+#      add-mappings: false
 #logging
 logging:
   level:
     org.springframework.web.servlet.PageNotFound: ERROR
+    org.springframework.web.multipart: DEBUG
     com.niranzan.inventory: DEBUG
+
+upload-path:
+  base: uploads
+  invoices: invoices
+  images: images
+  temp: temp
+
+default:
+  image-path: /images/product-default-image.png

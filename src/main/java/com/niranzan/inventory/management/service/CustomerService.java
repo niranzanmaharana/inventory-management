@@ -15,6 +15,11 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
+    public List<CustomerDto> findAll() {
+        List<Customer> customers = customerRepository.findAll();
+        return customers.stream().map(customerMapper::toDto).toList();
+    }
+
     public List<CustomerDto> search(String keyword) {
         List<Customer> customers = customerRepository.findByFirstNameContainingIgnoreCaseOrMobileContaining(keyword, keyword);
         return customers.stream().map(customerMapper::toDto).toList();

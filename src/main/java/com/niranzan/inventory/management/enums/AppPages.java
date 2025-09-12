@@ -36,8 +36,9 @@ public enum AppPages {
     // Invoice Page
     INVOICE_PATH("invoice/invoice"),
     INVOICE_LIST_PATH("invoice/invoice-list"),
-    // Report page
-    PURCHASE_REPORT_PATH("report/purchase-report");
+    // Report pages
+    PURCHASE_REPORT_PATH("report/purchase-report"),
+    SALES_REPORT_PATH("report/sales-report");
 
     private final String path;
 }

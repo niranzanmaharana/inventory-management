@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<link rel="stylesheet" th:href="@{/webjars/jquery-ui/jquery-ui.min.css}" />
+<link rel="stylesheet" th:href="@{/css/sales-report.css}">
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-secondary">
+                <i class="bi bi-graph-up-arrow"></i> Sales Report
+            </h2>
+            <div>
+                <button type="button" id="exportExcel" class="btn btn-success me-2">
+                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+                </button>
+                <button type="button" id="printReport" class="btn btn-outline-primary">
+                    <i class="bi bi-printer"></i> Print
+                </button>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-funnel"></i> Filters
+                </h5>
+            </div>
+            <div class="card-body">
+                <form class="row g-3" id="salesReportFilter">
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" id="endDate" name="endDate" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="customer" class="form-label">Customer</label>
+                        <select id="customer" name="customerId" class="form-select">
+                            <option value="">All Customers</option>
+                            <option th:each="customer : ${customers}" th:value="${customer.id}"
+                                th:text="${customer.firstName + ' ' + customer.lastName}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="button" id="filterBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-search"></i> Filter
+                        </button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Analytics Cards -->
+        <div class="row mb-4" id="analyticsCards">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" id="totalRevenue">₹0.00</h4>
+                                <p class="card-text">Total Revenue</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-currency-rupee fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" id="totalTransactions">0</h4>
+                                <p class="card-text">Total Transactions</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-receipt fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" id="averageOrderValue">₹0.00</h4>
+                                <p class="card-text">Average Order Value</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-graph-up fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" id="totalTax">₹0.00</h4>
+                                <p class="card-text">Total Tax</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-percent fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Sales Trend</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="salesTrendChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Methods</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="paymentMethodChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Sales Transactions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Invoice #</th>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Payment Method</th>
+                                <th>Subtotal</th>
+                                <th>Tax</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <tr id="no-data">
+                                <td colspan="11" class="text-center">No sales found for the selected filters.</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="6" class="text-end">Total</th>
+                                <th id="subtotalTotal">₹0.00</th>
+                                <th id="taxTotal">₹0.00</th>
+                                <th id="discountTotal">₹0.00</th>
+                                <th id="grandTotal">₹0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
+    <script th:src="@{/webjars/chart.js/4.4.0/dist/chart.min.js}"></script>
+    <script th:src="@{/js/sales-report.js}"></script>
+</body>
+
+</html>

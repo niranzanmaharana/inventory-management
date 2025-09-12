@@ -33,7 +33,8 @@ public class SalesTransactionMapper {
         Customer customer = transaction.getCustomer();
         if (customer != null) {
             CustomerResponse customerResponse = new CustomerResponse();
-            customerResponse.setCustomerCode(customerResponse.getCustomerCode());
+            customerResponse.setId(customer.getId());
+            customerResponse.setCustomerCode(customer.getCustomerCode());
             customerResponse.setCustomerName(customer.getFirstName() + " - " + customer.getLastName());
             customerResponse.setAddress(customer.getAddress());
             customerResponse.setEmail(customer.getEmail());

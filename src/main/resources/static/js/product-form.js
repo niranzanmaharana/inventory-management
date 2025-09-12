@@ -18,7 +18,6 @@ $(function () {
         }
     });
 
-    // ✅ NEW: Restore attribute values from JSON if form reloaded with errors
     const attributeJsonVal = $('#attributeJson').val();
     if (attributeJsonVal) {
         try {

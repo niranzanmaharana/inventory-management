@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-secondary">Invoice Repo</h2>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <form id="invoiceFilterForm" class="row g-3">
+                        <!-- Filter Type Dropdown -->
+                        <div class="col-md-4">
+                            <label for="filterType" class="form-label">Filter By</label>
+                            <select id="filterType" name="filterType" class="form-select">
+                                <option value="">-- Select --</option>
+                                <option value="invoice-number">Invoice Number</option>
+                                <option value="order-number">Order Number</option>
+                                <option value="customer-id">Customer</option>
+                                <option value="date-range">Date Range</option>
+                            </select>
+                        </div>
+
+                        <!-- Invoice Number Input -->
+                        <div class="col-md-4 filter-input d-none" id="invoiceNumberInput">
+                            <label for="invoice-number" class="form-label">Invoice Number</label>
+                            <input type="text" id="invoice-number" name="invoiceNumber" class="form-control">
+                        </div>
+
+                        <!-- Order Number Input -->
+                        <div class="col-md-4 filter-input d-none" id="orderNumberInput">
+                            <label for="order-number" class="form-label">Order Number</label>
+                            <input type="text" id="order-number" name="orderNumber" class="form-control">
+                        </div>
+
+                        <!-- Customer Input (Autocomplete) -->
+                        <div class="col-md-4 filter-input d-none" id="customerInput">
+                            <label for="customerName" class="form-label">Customer Name</label>
+                            <input type="text" id="customerName" name="customerName" class="form-control"
+                                placeholder="Type name or mobile...">
+                            <input type="hidden" id="customer-id" name="customerId">
+                            <div id="customerResults" class="list-group position-absolute w-100" style="z-index: 1000;">
+                            </div>
+                        </div>
+
+                        <!-- Date Range Inputs -->
+                        <div class="col-md-4 filter-input d-none" id="dateRangeInput">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control">
+                        </div>
+                        <div class="col-md-4 filter-input d-none" id="endDateInput">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-md-4 align-self-end btn-search">
+                            <button type="submit" class="btn btn-primary w-100">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="mt-4">
+                <table class="table table-bordered table-primary" id="invoiceTable">
+                    <thead>
+                        <tr>
+                            <th>Invoice Number</th>
+                            <th>Order Number</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total Amount</th>
+                            <th>Payment Method</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/js/invoice-list.js}"></script>
+</body>
+
+</html>

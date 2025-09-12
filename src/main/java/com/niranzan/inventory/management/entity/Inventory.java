@@ -9,7 +9,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,9 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "inventory", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"batch_code"}, name = "UK_BATCH_CODE")
-})
+@Table(name = "inventory")
 @Getter
 @Setter
 public class Inventory extends BaseEntity {
@@ -53,6 +50,12 @@ public class Inventory extends BaseEntity {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal pricePerUnit;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal discountPercent = BigDecimal.valueOf(0.0);
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal taxPercent = BigDecimal.valueOf(0.0);
 
     @Column(nullable = false)
     private LocalDate expiryDate;

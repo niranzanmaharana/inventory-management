@@ -7,7 +7,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,9 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "purchase_order_item", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "batch_code", name = "UK_BATCH_CODE")
-})
+@Table(name = "purchase_order_item")
 public class PurchaseOrderItem extends BaseEntity {
     @ManyToOne(optional = false)
     @JoinColumn(
@@ -37,7 +34,7 @@ public class PurchaseOrderItem extends BaseEntity {
     )
     private ProductItem productItem;
 
-    @Column(name = "batch_code", unique = true, length = 50)
+    @Column(name = "batch_code", length = 50)
     private String batchCode;
 
     @Column(nullable = false)
@@ -54,4 +51,10 @@ public class PurchaseOrderItem extends BaseEntity {
 
     @Column(name = "received", nullable = false)
     private Boolean received = false;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal discountPercent = BigDecimal.valueOf(0.0);
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal taxPercent = BigDecimal.valueOf(0.0);
 }

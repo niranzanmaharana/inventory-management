@@ -20,6 +20,7 @@ import com.niranzan.inventory.management.repository.PurchaseOrderItemRepository;
 import com.niranzan.inventory.management.repository.PurchaseOrderRepository;
 import com.niranzan.inventory.management.repository.SupplierRepository;
 import com.niranzan.inventory.management.utils.MessageFormatUtil;
+import com.niranzan.inventory.management.view.response.PurchaseOrderItemResponse;
 import com.niranzan.inventory.management.view.response.PurchaseOrderResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static com.niranzan.inventory.management.config.AppMessage.MSG_PO_IS_NOT_IN_DRAFT;
@@ -56,7 +57,6 @@ public class PurchaseOrderService {
                 .toList();
     }
 
-
     @Transactional
     public String draftPurchaseOrder(PurchaseOrderDto purchaseOrderDto) {
         Supplier supplier = supplierRepository.findById(purchaseOrderDto.getSupplierId())
@@ -77,7 +77,8 @@ public class PurchaseOrderService {
         purchaseOrder.setBillFileUrl("PENDING");
 
         // Handle PO Items
-        updatePurchaseOrderItems(purchaseOrder, purchaseOrderDto.getItems());
+        List<PurchaseOrderItem> purchaseOrderItems = preparePurchaseOrderItems(purchaseOrder, purchaseOrderDto.getItems());
+        purchaseOrder.setItems(purchaseOrderItems);
 
         PurchaseOrder saved = purchaseOrderRepository.save(purchaseOrder);
         return saved.getStatus().getStatus();
@@ -130,41 +131,39 @@ public class PurchaseOrderService {
         return saved.getStatus().getStatus();
     }
 
-    private void updatePurchaseOrderItems(PurchaseOrder purchaseOrder, List<PurchaseItemDto> itemDtos) {
-        List<PurchaseOrderItem> existingItems = purchaseOrder.getItems();
+    public List<PurchaseOrderItemResponse> filterPurchaseOrderItems(LocalDate startDate, LocalDate endDate, Long supplierId, Long categoryId) {
+        return purchaseOrderItemRepository.findByFilters(startDate, endDate, supplierId, categoryId).stream()
+                .map(purchaseOrderItemMapper::toResponse)
+                .toList();
+    }
 
-        // Remove items no longer present in the DTO
-        existingItems.removeIf(existingItem ->
-                itemDtos.stream().noneMatch(dto -> Objects.equals(dto.getId(), existingItem.getId()))
-        );
+    private List<PurchaseOrderItem> preparePurchaseOrderItems(PurchaseOrder purchaseOrder, List<PurchaseItemDto> itemDtos) {
+        List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
 
         for (PurchaseItemDto itemDto : itemDtos) {
-            PurchaseOrderItem item = existingItems.stream()
-                    .filter(existing -> Objects.equals(existing.getId(), itemDto.getId()))
-                    .findFirst()
-                    .orElse(null);
+            PurchaseOrderItem item = new PurchaseOrderItem();
 
             ProductItem productItem = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             MessageFormatUtil.format(AppMessage.MSG_PRODUCT_NOT_FOUND_WITH_ID.getMessage(), String.valueOf(itemDto.getProductId()))));
 
-            if (item == null) {
-                item = new PurchaseOrderItem();
-                item.setPurchaseOrder(purchaseOrder);
-                item.setBatchCode(generateBatchCode());
-                existingItems.add(item);
-            }
-
             item.setProductItem(productItem);
             item.setQuantity(itemDto.getQuantity());
             item.setPricePerUnit(itemDto.getPricePerUnit());
+            item.setDiscountPercent(itemDto.getDiscountPercent());
+            item.setTaxPercent(itemDto.getTaxPercent());
 
             LocalDate expiry = getOrDefault(itemDto.getExpiryDate(),
                     LocalDate.parse(AppConstants.DEFAULT_EXPIRY_DATE.getValue()));
             item.setExpiryDate(expiry);
 
             item.setSubTotal(item.getPricePerUnit().multiply(BigDecimal.valueOf(item.getQuantity())));
+            item.setPurchaseOrder(purchaseOrder);
+            item.setBatchCode(generateBatchCode());
+            purchaseOrderItems.add(item);
         }
+        log.info("{} purchase items added.", purchaseOrderItems.size());
+        return purchaseOrderItems;
     }
 
     private Inventory buildInventory(PurchaseOrderItem purchaseOrderItem, ProductItem productItem) {
@@ -175,6 +174,8 @@ public class PurchaseOrderService {
         inventory.setReceivedQuantity(purchaseOrderItem.getQuantity());
         inventory.setAvailableQuantity(purchaseOrderItem.getQuantity());
         inventory.setPricePerUnit(purchaseOrderItem.getPricePerUnit());
+        inventory.setDiscountPercent(purchaseOrderItem.getDiscountPercent());
+        inventory.setTaxPercent(purchaseOrderItem.getTaxPercent());
         inventory.setExpiryDate(purchaseOrderItem.getExpiryDate());
         inventory.setBatchCode(purchaseOrderItem.getBatchCode());
         inventory.setEnabled(Boolean.TRUE);

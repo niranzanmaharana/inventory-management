@@ -17,6 +17,9 @@ import java.time.LocalDate;
 public class PurchaseOrderItemResponse {
     private Long id;
     private String productName;
+    private String categoryName;
+    private String supplierName;
+    private String orderNumber;
     private String batchCode;
     private Integer quantity;
     private BigDecimal pricePerUnit;

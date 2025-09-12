@@ -2,6 +2,7 @@ package com.niranzan.inventory.management.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.niranzan.inventory.management.dto.ProductBatchDto;
 import com.niranzan.inventory.management.dto.ProductDto;
 import com.niranzan.inventory.management.enums.AppMessageParameter;
 import com.niranzan.inventory.management.enums.ImageFileType;
@@ -52,6 +53,12 @@ public class ProductController extends BaseController {
     private final ObjectMapper objectMapper;
     @Value("${default.image-path}")
     private String defaultImagePath;
+
+    @GetMapping("/search")
+    @ResponseBody
+    public List<ProductBatchDto> search(@RequestParam String keyword) {
+        return productService.searchProductsWithBatch(keyword);
+    }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'STAFF')")
     @GetMapping("/product-list")

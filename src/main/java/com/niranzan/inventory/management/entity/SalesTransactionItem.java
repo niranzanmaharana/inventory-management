@@ -1,9 +1,21 @@
 package com.niranzan.inventory.management.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "sales_transaction_item")
+@Getter
+@Setter
 public class SalesTransactionItem extends BaseEntity {
     @ManyToOne(optional = false)
     @JoinColumn(
@@ -21,52 +33,28 @@ public class SalesTransactionItem extends BaseEntity {
     )
     private ProductItem productItem;
 
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(
+            name = "inventory_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_SALES_TX_X_INVENTORY")
+    )
+    private Inventory inventory;
+
     @Column(nullable = false)
     private Integer quantity;
 
     @Column(nullable = false)
-    private Double pricePerUnit;
+    private BigDecimal pricePerUnit;
 
     @Column(nullable = false)
-    private Double subtotal;
+    private BigDecimal subtotal;
 
-    public SalesTransaction getSalesTransaction() {
-        return salesTransaction;
-    }
+    private BigDecimal discountPercent;
 
-    public void setSalesTransaction(SalesTransaction salesTransaction) {
-        this.salesTransaction = salesTransaction;
-    }
+    private BigDecimal discountAmount;
 
-    public ProductItem getProductItem() {
-        return productItem;
-    }
+    private BigDecimal taxPercent;
 
-    public void setProductItem(ProductItem productItem) {
-        this.productItem = productItem;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Double getPricePerUnit() {
-        return pricePerUnit;
-    }
-
-    public void setPricePerUnit(Double pricePerUnit) {
-        this.pricePerUnit = pricePerUnit;
-    }
-
-    public Double getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
-    }
+    private BigDecimal taxAmount;
 }

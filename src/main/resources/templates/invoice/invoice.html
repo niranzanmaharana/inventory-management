@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory Management System</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.png}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}" />
+    <link rel="stylesheet" th:href="@{/css/invoice.css}">
+</head>
+
+<body>
+    <div class="invoice mt-4">
+        <div class="invoice mt-4">
+            <div class="invoice-header d-flex justify-content-between align-items-center">
+                <h1>INVOICE</h1>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-primary me-2" id="downloadInvoice">
+                        <i class="bi bi-printer"></i> Print
+                    </button>
+                    <button class="btn btn-success" id="downloadPdf">
+                        <i class="bi bi-download"></i> Download
+                    </button>
+                    <img th:src="@{/images/favicon.png}" alt="Logo" width="50"
+                        class="d-inline-block align-text-top ms-3">
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h5>Bill To</h5>
+                    <strong th:text="${transaction.customer.customerName}">Mason Carter</strong><br>
+                    Customer Code: <span th:text="${transaction.customer.customerCode}">7657</span><br>
+                    Address: <span th:text="${transaction.customer.address}">United States</span><br>
+                    Phone: <span th:text="${transaction.customer.mobile}">(816) 741-5790</span><br>
+                    Email: <span th:text="${transaction.customer.email}">email@client.com</span><br>
+                </div>
+                <div class="col-sm-6">
+                    <h5>From</h5>
+                    <strong>Mason Carter</strong><br>
+                    875 N Coast Hwybr<br>
+                    Laguna Beach, California, 92651<br>
+                    United States<br>
+                    Phone: (949) 494-7695<br>
+                    Email: email@domain.com
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <table class="table table-borderless table-sm tx-table">
+                        <tr>
+                            <td>
+                                <h6>Invoice #:</h6>
+                            </td>
+                            <td>
+                                <h6><span th:text="${transaction.invoiceNumber}">9742</span></h6>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Order ID #:</td>
+                            <td><span th:text="${transaction.orderNumber}">9742</span></td>
+                        </tr>
+                        <tr>
+                            <td>Invoice Date:</td>
+                            <td><span th:text="${transaction.formattedTxDate}">12/10/2025</span></td>
+                        </tr>
+                        <tr>
+                            <td>Payment Method:</td>
+                            <td><span th:text="${transaction.paymentMethod}">CASH</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>UNIT PRICE</th>
+                        <th>Quantity</th>
+                        <th>Discount</th>
+                        <th>Tax</th>
+                        <th>AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item, iterStat : ${transaction.items}">
+                        <td th:text="${iterStat.index + 1}"></td>
+                        <td th:text="${item.productName}"></td>
+                        <td>₹ <span th:text="${item.amount != null ? item.amount : 0.00}"></span></td>
+                        <td th:text="${item.quantity != null ? item.quantity : 0}"></td>
+                        <td>₹ <span class="text-success"
+                                th:text="${item.discountAmount != null ? item.discountAmount : 0.00}"></span> (<span
+                                class="text-muted"
+                                th:text="${item.discountPercent != null ? item.discountPercent : 0}"></span> %)</td>
+                        <td>₹ <span class="text-danger"
+                                th:text="${item.taxAmount != null ? item.taxAmount : 0.00}"></span> (<span
+                                class="text-muted" th:text="${item.taxPercent != null ? item.taxPercent : 0}"></span> %)
+                        </td>
+                        <td>₹ <span th:text="${item.subtotal != null ? item.subtotal : 0.00}"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="text-end">Discount</td>
+                        <td>₹ <span class="text-success"
+                                th:text="${transaction.totalDiscount != null ? transaction.totalDiscount : 0.00}">15.00</span>
+                            &nbsp;&nbsp;<i class="bi bi-arrow-up"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="text-end">Tax</td>
+                        <td>₹ <span class="text-danger"
+                                th:text="${transaction.totalTax != null ? transaction.totalTax : 0.00}">18.10</span>
+                            &nbsp;&nbsp;<i class="bi bi-arrow-down"></i>
+                        </td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="6" class="text-end">Grand Total</td>
+                        <td>₹ <span
+                                th:text="${transaction.grandTotal != null ? transaction.grandTotal : 0.00}">495.10</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center mt-4">
+                Thank you for doing business. Please visit again!
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+        <script>
+            $(function () {
+                $('#downloadInvoice').on('click', function () {
+                    alert('Downloading invoice...');
+                    // Here: generate PDF or trigger file download
+                });
+                $('#submitPayment').on('click', function () {
+                    alert('Redirecting to payment gateway...');
+                    // Here: integrate payment gateway redirection
+                });
+            });
+        </script>
+</body>
+
+</html>

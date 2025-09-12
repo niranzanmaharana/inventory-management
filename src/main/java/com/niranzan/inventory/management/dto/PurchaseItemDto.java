@@ -30,6 +30,14 @@ public class PurchaseItemDto {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be positive")
     private BigDecimal pricePerUnit;
 
+    @NotNull(message = "Discount percent unit is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Discount percent must be positive")
+    private BigDecimal discountPercent = BigDecimal.valueOf(0.0);
+
+    @NotNull(message = "Tax percent is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Tax percent must be positive")
+    private BigDecimal taxPercent = BigDecimal.valueOf(0.0);
+
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate expiryDate;
 }

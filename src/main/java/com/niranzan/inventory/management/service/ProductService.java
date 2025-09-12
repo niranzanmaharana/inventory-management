@@ -3,6 +3,7 @@ package com.niranzan.inventory.management.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.niranzan.inventory.management.dto.ProductBatchDto;
 import com.niranzan.inventory.management.dto.ProductDto;
 import com.niranzan.inventory.management.entity.AttributeType;
 import com.niranzan.inventory.management.entity.ProductAttribute;
@@ -291,5 +292,9 @@ public class ProductService {
         long nextId = (maxId != null ? maxId + 1 : 1);
 
         return String.format("%s-%04d", prefix, nextId);
+    }
+
+    public List<ProductBatchDto> searchProductsWithBatch(String keyword) {
+        return productRepository.searchProductsWithBatch(keyword);
     }
 }

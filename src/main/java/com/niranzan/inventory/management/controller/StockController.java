@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/stock")
 @RequiredArgsConstructor
-public class StockController {
+public class StockController extends BaseController {
     private final StockService stockService;
 
     @GetMapping("/stock-list")
     public String getStocks(Model model) {
         model.addAttribute("stocks", stockService.findAll());
-        return "stock/stock-list.html";
+        return "stock/stock-list";
     }
 }

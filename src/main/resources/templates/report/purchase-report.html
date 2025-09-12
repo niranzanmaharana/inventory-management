@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<link rel="stylesheet" th:href="@{/webjars/jquery-ui/jquery-ui.min.css}" />
+<link rel="stylesheet" th:href="@{/css/category.css}">
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container fade-in mt-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-secondary">Purchase Report</h2>
+        </div>
+
+        <div th:replace="~{fragments/message :: message}"></div>
+
+        <!-- Filters -->
+        <form class="row g-3 mb-4" id="purchaseReportFilter">
+            <div class="col-md-3">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input type="text" id="startDate" name="startDate" class="form-control datepicker">
+            </div>
+            <div class="col-md-3">
+                <label for="endDate" class="form-label">End Date</label>
+                <input type="text" id="endDate" name="endDate" class="form-control datepicker">
+            </div>
+            <div class="col-md-3">
+                <label for="supplier" class="form-label">Supplier</label>
+                <select id="supplier" name="supplier" class="form-select">
+                    <option value="">All</option>
+                    <option th:each="supplier : ${suppliers}" th:value="${supplier.id}"
+                        th:text="${supplier.supplierName}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="category" class="form-label">Category</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="">All</option>
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.categoryName}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-12 text-end">
+                <button type="button" id="filterBtn" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+                <button type="button" id="resetBtn" class="btn btn-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+            </div>
+        </form>
+
+        <!-- Report Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Purchase Date</th>
+                        <th>Supplier</th>
+                        <th>Category</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody">
+                    <tr id="no-data">
+                        <td colspan="8" class="text-center">No purchases found for the selected filters.</td>
+                    </tr>
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="7" class="text-end">Total Amount</th>
+                        <th>₹ <span th:text="${totalAmount != null ? totalAmount : 0.0}"></span></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-3 text-end">
+            <button type="button" id="exportExcel" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </button>
+            <button type="button" id="printReport" class="btn btn-outline-primary">
+                <i class="bi bi-printer"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
+    <script>
+        $(function () {
+            // Initialize datepicker
+            $(".datepicker").datepicker({
+                dateFormat: "dd-mm-yy",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "1900:c"
+            });
+
+            // Filter button click
+            $("#filterBtn").on("click", function () {
+                loadPurchases();
+            });
+
+            // Print report
+            $("#printReport").on("click", function () {
+                window.open('/purchase-report/print?' + $("#purchaseReportFilter").serialize(), '_blank');
+            });
+
+            // Export Excel
+            $("#exportExcel").on("click", function () {
+                window.location.href = '/purchase-report/export?' + $("#purchaseReportFilter").serialize();
+            });
+
+            // Reset filters
+            $("#resetBtn").on("click", function () {
+                $("#purchaseReportFilter")[0].reset();
+            });
+
+            function loadPurchases() {
+                $.ajax({
+                    url: "/report/purchase-report/filter",
+                    type: "GET",
+                    data: $("#purchaseReportFilter").serialize(),
+                    success: function (data) {
+                        let tbody = $("#reportBody");
+                        tbody.empty();
+
+                        if (data.length === 0) {
+                            tbody.append('<tr><td colspan="8" class="text-center">No purchases found for the selected filters.</td></tr>');
+                            return;
+                        }
+
+                        let totalAmount = 0;
+                        $.each(data, function (i, purchase) {
+                            let total = purchase.quantity * purchase.unitPrice;
+                            totalAmount += total;
+
+                            tbody.append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${purchase.date}</td>
+                            <td>${purchase.supplier.supplierName}</td>
+                            <td>${purchase.category.categoryName}</td>
+                            <td>${purchase.productName}</td>
+                            <td>${purchase.quantity}</td>
+                            <td>${purchase.unitPrice}</td>
+                            <td>${total.toFixed(2)}</td>
+                        </tr>
+                    `);
+                        });
+
+                        // Update total footer
+                        $("tfoot th:last").text(totalAmount.toFixed(2));
+                    },
+                    error: function () {
+                        alert("Error loading purchases.");
+                    }
+                });
+            }
+
+            // Load default data on page load
+            loadPurchases();
+
+            // Reset filters
+            $("#resetBtn").on("click", function () {
+                $("#purchaseReportFilter")[0].reset();
+                loadPurchases();
+            });
+        });
+    </script>
+</body>
+
+</html>

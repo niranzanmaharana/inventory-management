@@ -1,6 +1,7 @@
 package com.niranzan.inventory.management.mapper;
 
 import com.niranzan.inventory.management.dto.PurchaseItemDto;
+import com.niranzan.inventory.management.entity.ProductItem;
 import com.niranzan.inventory.management.entity.PurchaseOrderItem;
 import com.niranzan.inventory.management.view.response.PurchaseOrderItemResponse;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,13 @@ public class PurchaseOrderItemMapper {
     }
 
     public PurchaseOrderItemResponse toResponse(PurchaseOrderItem purchaseOrderItem) {
+        ProductItem product = purchaseOrderItem.getProductItem();
         return PurchaseOrderItemResponse.builder()
                 .id(purchaseOrderItem.getId())
-                .productName(purchaseOrderItem.getProductItem().getProductName())
+                .productName(product.getProductName())
+                .categoryName(product.getCategory().getCategoryName())
+                .supplierName(purchaseOrderItem.getPurchaseOrder().getSupplier().getSupplierName())
+                .orderNumber(purchaseOrderItem.getPurchaseOrder().getOrderNumber())
                 .batchCode(purchaseOrderItem.getBatchCode())
                 .quantity(purchaseOrderItem.getQuantity())
                 .pricePerUnit(purchaseOrderItem.getPricePerUnit())

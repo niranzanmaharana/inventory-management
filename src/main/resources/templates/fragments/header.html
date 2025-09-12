@@ -54,7 +54,7 @@
                             <ul class="dropdown-menu" aria-labelledby="masterDropdown">
                                 <li sec:authorize="hasRole('ROLE_ADMIN')">
                                     <a class="dropdown-item" th:href="@{/user/user-list}">
-                                        <i class="bi bi-person-lines-fill"></i> Users
+                                        <i class="bi bi-people-fill"></i> Users
                                     </a>
                                 </li>
                                 <li>
@@ -69,12 +69,12 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" th:href="@{/product-category/category-list}">
-                                        <i class="bi bi-tags"></i> Categories
+                                        <i class="bi bi-tags-fill"></i> Categories
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" th:href="@{/product/product-list}">
-                                        <i class="bi bi-box"></i> Products
+                                        <i class="bi bi-box-seam"></i> Products
                                     </a>
                                 </li>
                             </ul>
@@ -86,7 +86,7 @@
                             <a class="nav-link dropdown-toggle" href="#" id="opsDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false"
                                 th:classappend="${requestURI.matches('^/(purchase-order|stock)/.*')} ? 'active'">
-                                <i class="bi bi-list-task"></i> Operations
+                                <i class="bi bi-list-check"></i> Operations
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="opsDropdown">
                                 <li>
@@ -104,9 +104,17 @@
 
                         <!-- Sell (Staff only) -->
                         <li class="nav-item" sec:authorize="hasRole('ROLE_STAFF')">
-                            <a class="nav-link" th:href="@{/sell/sell-dashboard}"
-                                th:classappend="${requestURI.startsWith('/sell')} ? 'active'">
-                                <i class="bi bi-cart-check"></i> Sell
+                            <a class="nav-link" th:href="@{/sales/sales-dashboard}"
+                                th:classappend="${requestURI.startsWith('/sales')} ? 'active'">
+                                <i class="bi bi-cart-fill"></i> Sell
+                            </a>
+                        </li>
+
+                        <!-- Invoice (All) -->
+                        <li class="nav-item" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_STAFF')">
+                            <a class="nav-link" th:href="@{/invoice/invoice-list}"
+                                th:classappend="${requestURI.startsWith('/invoice')} ? 'active'">
+                                <i class="bi bi-receipt"></i> Invoice
                             </a>
                         </li>
 
@@ -115,18 +123,23 @@
                             <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false"
                                 th:classappend="${requestURI.matches('^/(report)/.*')} ? 'active'">
-                                <i class="bi bi-graph-up"></i> Reports
+                                <i class="bi bi-graph-up-arrow"></i> Reports
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/report/inventory}"><i
-                                            class="bi bi-box-seam"></i> Inventory Report</a></li>
-                                <li><a class="dropdown-item" th:href="@{/report/sales}"><i
-                                            class="bi bi-bar-chart-line"></i> Sales Report</a></li>
-                                <li><a class="dropdown-item" th:href="@{/report/purchase}"><i class="bi bi-receipt"></i>
-                                        Purchase Report</a></li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/report/sales-report}">
+                                        <i class="bi bi-bar-chart-line"></i> Sales Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{/report/purchase-report}">
+                                        <i class="bi bi-receipt-cutoff"></i> Purchase Report
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
+
                     <!-- RIGHT SIDE USER DROPDOWN -->
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
@@ -144,7 +157,7 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" th:href="@{/profile/change-password}">
-                                        <i class="bi bi-person"></i> Change Password
+                                        <i class="bi bi-key-fill"></i> Change Password
                                     </a>
                                 </li>
                                 <li>

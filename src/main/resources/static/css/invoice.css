@@ -1,0 +1,36 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.invoice {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.invoice h1 {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.invoice-header {
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+}
+
+.total-row {
+    font-weight: bold;
+}
+
+.tx-table td {
+    padding: 0px;
+    margin: 0xp;
+}

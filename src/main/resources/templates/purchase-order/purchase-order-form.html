@@ -91,6 +91,18 @@
                                             th:field="*{items[__${iterStat.index}__].pricePerUnit}" required />
                                     </div>
                                     <div class="col-md-3">
+                                        <label>Discount (%)</label>
+                                        <input type="number" step="0.01" class="form-control"
+                                            name="*{items[__${iterStat.index}__].discountPercent}"
+                                            placeholder="Discount" required />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Tax (%)</label>
+                                        <input type="number" step="0.01" class="form-control"
+                                            name="*{items[__${iterStat.index}__].taxPercent}" placeholder="Tax"
+                                            required />
+                                    </div>
+                                    <div class="col-md-3">
                                         <label>Expiry Date</label>
                                         <input type="text" class="form-control expiryDate"
                                             th:field="*{items[__${iterStat.index}__].expiryDate}" required />
@@ -151,6 +163,16 @@
                             placeholder="Price/Unit" required />
                     </div>
                     <div class="col-md-3">
+                        <label>Discount (%)</label>
+                        <input type="number" step="0.01" class="form-control" name="items[__index__].discountPercent"
+                            placeholder="Discount" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tax (%)</label>
+                        <input type="number" step="0.01" class="form-control" name="items[__index__].taxPercent"
+                            placeholder="Tax" required />
+                    </div>
+                    <div class="col-md-3">
                         <label>Expiry Date</label>
                         <input type="text" class="form-control expiryDate" name="items[__index__].expiryDate"
                             placeholder="Expiry Date" />
@@ -164,7 +186,6 @@
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
-    <script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
     <script th:src="@{/js/purchase-order.js}"></script>
 </body>
 

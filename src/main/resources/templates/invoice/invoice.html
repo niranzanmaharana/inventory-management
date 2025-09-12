@@ -23,9 +23,6 @@
                     <button class="btn btn-primary me-2" id="downloadInvoice">
                         <i class="bi bi-printer"></i> Print
                     </button>
-                    <button class="btn btn-success" id="downloadPdf">
-                        <i class="bi bi-download"></i> Download
-                    </button>
                     <img th:src="@{/images/favicon.png}" alt="Logo" width="50"
                         class="d-inline-block align-text-top ms-3">
                 </div>
@@ -137,10 +134,37 @@
         <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
         <script>
             $(function () {
+                // Print functionality
                 $('#downloadInvoice').on('click', function () {
-                    alert('Downloading invoice...');
-                    // Here: generate PDF or trigger file download
+                    window.print();
                 });
+                
+                // PDF Download functionality
+                $('#downloadPdf').on('click', function () {
+                    const invoiceNumber = /*[[${transaction.invoiceNumber}]]*/ '';
+                    if (invoiceNumber) {
+                        // Show loading state
+                        $(this).prop('disabled', true);
+                        $(this).html('<i class="bi bi-hourglass-split"></i> Generating...');
+                        
+                        // Create a temporary link to download the PDF
+                        const link = document.createElement('a');
+                        link.href = '/invoice/download/' + invoiceNumber;
+                        link.download = 'invoice-' + invoiceNumber + '.pdf';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // Reset button state after a short delay
+                        setTimeout(() => {
+                            $(this).prop('disabled', false);
+                            $(this).html('<i class="bi bi-download"></i> Download');
+                        }, 2000);
+                    } else {
+                        alert('Invoice number not found!');
+                    }
+                });
+                
                 $('#submitPayment').on('click', function () {
                     alert('Redirecting to payment gateway...');
                     // Here: integrate payment gateway redirection

@@ -36,6 +36,7 @@
         <select2.version>4.0.13</select2.version>
         <jquery-ui.version>1.12.1</jquery-ui.version>
         <jquery-ui-timepicker.version>1.6.3</jquery-ui-timepicker.version>
+        <pdfbox.version>3.0.1</pdfbox.version>
     </properties>
     <dependencies>
         <dependency>
@@ -170,6 +171,23 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator-core</artifactId>
+        </dependency>
+
+        <!-- PDF Generation -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>${pdfbox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox-tools</artifactId>
+            <version>${pdfbox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>9.1.22</version>
         </dependency>
 
         <dependency>

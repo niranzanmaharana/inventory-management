@@ -95,8 +95,11 @@ $(document).ready(function () {
                             <td>${invoice.grandTotal}</td>
                             <td>${invoice.paymentMethod}</td>
                             <td>
-                                <a href="/invoice/view/${invoice.invoiceNumber}" target="_blank" class="btn btn-sm btn-primary">
+                                <a href="/invoice/view/${invoice.invoiceNumber}" target="_blank" class="btn btn-sm btn-primary me-1" title="View Invoice">
                                     <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="/invoice/download/${invoice.invoiceNumber}" class="btn btn-sm btn-success" title="Download PDF">
+                                    <i class="bi bi-download"></i>
                                 </a>
                             </td>
                         </tr>
